@@ -6,10 +6,14 @@ L'applicazione trasforma il preordine della *Batman Statue* (DC × Sideshow × Q
 
 > **Contesto accademico**: progetto realizzato per l'esame di UI/UX Design (*"Realizzazione di un prototipo interattivo di una esperienza di acquisto immersiva in modalità desktop"*, valutazione massima del prototipo: **27/30**). Il flusso di preordine e il checkout sono simulazioni locali del prototipo interattivo: non viene effettuata alcuna transazione reale né trasmissione di dati personali.
 
-- **Repository GitHub**: [https://github.com/alessandro-bottone-design/batman-statue-experience](https://github.com/alessandro-bottone-design/batman-statue-experience)
-- **Prototipo web pubblico (Vercel)**: [https://batman-statue-experience.vercel.app/](https://batman-statue-experience.vercel.app/)
-- **File Figma — Design System (`64:1521`)**: [BatmanStatueExperience_DesignSystem — Design System](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=64-1521&m=dev)
-- **File Figma — Tavole di Prototipo (`361:5043`)**: [BatmanStatueExperience_DesignSystem — Prototipo](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=361-5043&m=dev)
+- **Consegna Google Classroom**: [https://classroom.google.com/u/1/c/ODA4NDg1NTU3MTQ3/a/Nzk2ODE3Nzk2MTk0/details](https://classroom.google.com/u/1/c/ODA4NDg1NTU3MTQ3/a/Nzk2ODE3Nzk2MTk0/details)
+- **Repository GitHub (`main`)**: [https://github.com/alessandro-bottone-design/batman-statue-experience/tree/main](https://github.com/alessandro-bottone-design/batman-statue-experience/tree/main)
+- **Dashboard Progetto Vercel**: [https://vercel.com/abd-esign1/batman-statue-experience](https://vercel.com/abd-esign1/batman-statue-experience)
+- **Prototipo Web Live (Vercel)**: [https://batman-statue-experience.vercel.app/](https://batman-statue-experience.vercel.app/)
+- **Spazio di Progetto ChatGPT**: [https://chatgpt.com/g/g-p-6a15bf741ef08191ab845e2047c91493-sitowebbatmanstatueexperience/project](https://chatgpt.com/g/g-p-6a15bf741ef08191ab845e2047c91493-sitowebbatmanstatueexperience/project)
+- **Presentazione Figma Slides**: [https://www.figma.com/slides/lawZFub46cZaRJ38nCZN1q](https://www.figma.com/slides/lawZFub46cZaRJ38nCZN1q)
+- **File Figma — Design System (`64:1521`)**: [https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=64-1521&m=dev](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=64-1521&m=dev)
+- **File Figma — Tavole di Prototipo (`361:5043`)**: [https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=361-5043&m=dev](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=361-5043&m=dev)
 
 ---
 

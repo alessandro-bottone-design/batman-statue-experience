@@ -4,10 +4,16 @@
 **Traccia Accademica**: *"Realizzazione di un prototipo interattivo di una esperienza di acquisto immersiva in modalità desktop"*  
 **Strumenti di Progettazione e Sviluppo**: **Figma** (Design System e Prototipo) + **Antigravity** (Tool di AI Generativa per l'implementazione del prototipo interattivo, valutazione massima del prototipo: **27/30**)  
 
-- **Repository GitHub**: [https://github.com/alessandro-bottone-design/batman-statue-experience](https://github.com/alessandro-bottone-design/batman-statue-experience)
-- **Prototipo Live (Vercel)**: [https://batman-statue-experience.vercel.app/](https://batman-statue-experience.vercel.app/)
-- **Figma — Design System (`64:1521`)**: [BatmanStatueExperience_DesignSystem — Design System](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=64-1521&m=dev)
-- **Figma — Tavole di Prototipo (`361:5043`)**: [BatmanStatueExperience_DesignSystem — Prototipo](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=361-5043&m=dev)
+### Link Ufficiali del Progetto
+
+- **Consegna Google Classroom**: [https://classroom.google.com/u/1/c/ODA4NDg1NTU3MTQ3/a/Nzk2ODE3Nzk2MTk0/details](https://classroom.google.com/u/1/c/ODA4NDg1NTU3MTQ3/a/Nzk2ODE3Nzk2MTk0/details)
+- **Repository GitHub (`main`)**: [https://github.com/alessandro-bottone-design/batman-statue-experience/tree/main](https://github.com/alessandro-bottone-design/batman-statue-experience/tree/main)
+- **Dashboard Progetto Vercel**: [https://vercel.com/abd-esign1/batman-statue-experience](https://vercel.com/abd-esign1/batman-statue-experience)
+- **Prototipo Web Live (Vercel)**: [https://batman-statue-experience.vercel.app/](https://batman-statue-experience.vercel.app/)
+- **Spazio di Progetto ChatGPT**: [https://chatgpt.com/g/g-p-6a15bf741ef08191ab845e2047c91493-sitowebbatmanstatueexperience/project](https://chatgpt.com/g/g-p-6a15bf741ef08191ab845e2047c91493-sitowebbatmanstatueexperience/project)
+- **Presentazione Figma Slides**: [https://www.figma.com/slides/lawZFub46cZaRJ38nCZN1q](https://www.figma.com/slides/lawZFub46cZaRJ38nCZN1q)
+- **Figma — Design System (`64:1521`)**: [https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=64-1521&m=dev](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=64-1521&m=dev)
+- **Figma — Tavole di Prototipo (`361:5043`)**: [https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=361-5043&m=dev](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=361-5043&m=dev)
 
 ---
 
@@ -82,9 +88,9 @@ L'utente non è un semplice acquirente passivo, ma viene calato nei panni del Ca
 1. **Vincolo di Fruizione Desktop (`MobileNotice` / `mobile-advisor`, nodo `302:3164`)**: in pieno accordo con la traccia d'esame (*"in modalità desktop"*) e con il comportamento della Buyer Persona, l'accesso da smartphone o dispositivi touch viene bloccato con l'avviso dedicato `"DISPOSITIVO NON COMPATIBILE — Per vivere la Batman Statue Experience accedi da un dispositivo Desktop"`, preservando l'integrità dell'esperienza 3D e dello scrollytelling a 800 frame.
 2. **Copywriting e Tono di Voce *Tech-Noir***: ogni etichetta dell'interfaccia parla la lingua dell'universo di Batman (`"INIZIA LA MISSIONE"`, `"INTERAGISCI CON IL REPERTO PER DECIFRARE IL MESSAGGIO"`, `"TRANSIZIONE ALLA PROSSIMA AREA"`, `"SCOPRI LA STATUA"`, `"PREORDINA IL CAVALIERE"`).
 3. **Risposta puntuale ai driver del collezionista nello Showreel (`357:3713`)**:
-   - **Tappa 1 (`PRESENZA LEGGENDARIA`)**: *"Non arredamento, una presenza. Mantello in tensione, posa vigile: trasforma lo spazio in Gotham."*
-   - **Tappa 2 (`MATERIALI D'ELITE`)**: *"Resina ad alta densità, texture tattili dell'armatura e base architettonica: finitura da pezzo da museo, non da scaffale."*
-   - **Tappa 3 (`SCULTURA DI PRECISIONE`)**: *"Ogni ombra di Gotham scolpita con precisione. Volumi netti, cappuccio iconico e sguardi che restano: fedele da ogni angolo."*
+   - **Tappa 1 (`PRESENZA LEGGENDARIA`)**: *"Non arredamento, una presenza."*
+   - **Tappa 2 (`MATERIALI D'ELITE`)**: *"Finitura da pezzo da museo, non da scaffale."*
+   - **Tappa 3 (`SCULTURA DI PRECISIONE`)**: *"Ogni ombra di Gotham scolpita con precisione."*
 
 ---
 
