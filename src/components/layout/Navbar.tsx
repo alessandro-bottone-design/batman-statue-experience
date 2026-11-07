@@ -3,6 +3,7 @@ import { Button, IconButton, Logos, Timer } from "../ui/DesignSystem";
 
 export type NavPhase =
   | "start"
+  | "loading"
   | "storytelling"
   | "tutorial"
   | "gamification"
@@ -50,6 +51,11 @@ export default function Navbar({
     };
   }, []);
   const showHud = phase === "gamification" || phase === "tutorial";
+  const showMute = Boolean(onToggleMute) && phase !== "not-found";
+  const showPause =
+    Boolean(onTogglePause) &&
+    (isPaused ||
+      (phase !== "loading" && phase !== "showreel" && phase !== "not-found"));
 
   return (
     <nav
@@ -59,7 +65,7 @@ export default function Navbar({
       data-figma-node="249:1659"
     >
       <div className="ds-navbar-left">
-        {(phase !== "start" || isPaused) && <Logos />}
+        <Logos />
         {showHud && (
           <div className="ds-hud">
             <Timer seconds={timeLeft} small />
@@ -91,14 +97,14 @@ export default function Navbar({
           </div>
         )}
       </div>
-      {(onPreorder || onToggleMute || onTogglePause) && (
+      {(onPreorder || showMute || showPause) && (
         <div className="ds-navbar-actions">
           {onPreorder && (
             <Button size="small" onClick={onPreorder}>
               PREORDINA IL CAVALIERE
             </Button>
           )}
-          {onToggleMute && (
+          {showMute && (
             <IconButton
               icon={isMuted ? "audio-off" : "audio-on"}
               aria-label={isMuted ? "Attiva audio" : "Silenzia audio"}
@@ -106,7 +112,7 @@ export default function Navbar({
               onClick={onToggleMute}
             />
           )}
-          {onTogglePause && (
+          {showPause && (
             <IconButton
               icon={isPaused ? "play" : "pause"}
               aria-label={

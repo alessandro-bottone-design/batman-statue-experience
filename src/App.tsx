@@ -11,11 +11,15 @@ import { MotionConfig, useReducedMotion } from "motion/react";
 import PauseOverlay from "./components/ui/PauseOverlay";
 import BatcaveBackdrop from "./components/layout/BatcaveBackdrop";
 import Navbar, { type NavPhase } from "./components/layout/Navbar";
-import IntroScreen from "./features/intro/IntroScreen";
+import StorytellingScreen from "./features/intro/StorytellingScreen";
 import StartScreen from "./features/intro/StartScreen";
-import BatcomputerBootOverlay from "./features/intro/BatcomputerBootOverlay";
-import MissionResult from "./features/mission/MissionResult";
-import { Cursor, MobileNotice } from "./components/ui/DesignSystem";
+import TutorialScreen from "./features/intro/TutorialScreen";
+import MissionResultScreen from "./features/mission/MissionResultScreen";
+import {
+  Cursor,
+  LoadingScreen,
+  MobileNotice,
+} from "./components/ui/DesignSystem";
 import { useDesktop } from "./hooks/useDesktop";
 import { useMissionTimer } from "./hooks/useMissionTimer";
 import {
@@ -25,14 +29,14 @@ import {
 } from "./lib/experience";
 import { BatcavernAudio } from "./lib/audioManager";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
-import Statue from "./features/showreel/BatmanCamera";
-import Checkout from "./features/checkout/Checkout";
-import Confirmation from "./features/checkout/ThankYouPage";
-const Panorama = lazy(
-  () => import("./features/mission/SharedPanoramaCanvas"),
+import ShowreelScreen from "./features/showreel/ShowreelScreen";
+import CheckoutScreen from "./features/checkout/CheckoutScreen";
+import ThankYouScreen from "./features/checkout/ThankYouScreen";
+const GamificationScreen = lazy(
+  () => import("./features/mission/GamificationScreen"),
 );
-const Transition = lazy(
-  () => import("./features/mission/CinematicVideoPlayer"),
+const SkipTransitionScreen = lazy(
+  () => import("./features/mission/SkipTransitionScreen"),
 );
 const JokerAudio = lazy(() => import("./features/mission/JokerAudioManager"));
 export default function App() {
@@ -138,7 +142,8 @@ function Experience() {
     if (location.hash === "#conferma" && !state.order)
       history.replaceState(null, "", "#statua");
   }, [state.order]);
-  const canPause = phase !== "checkout" && phase !== "thankyou";
+  const canPause =
+    phase !== "checkout" && phase !== "thankyou" && phase !== "showreel";
   const togglePause = () => setPaused((previous) => !previous);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
@@ -224,10 +229,7 @@ function Experience() {
         >
           <Suspense
             fallback={
-              <div className="loading-screen legacy-pending" role="status">
-                <h1 className="sr-only">Inizializzazione della Batcaverna</h1>
-                Inizializzazione della Batcaverna…
-              </div>
+              <LoadingScreen srLabel="Inizializzazione della Batcaverna" />
             }
           >
             {phase === "start" && (
@@ -239,19 +241,19 @@ function Experience() {
               />
             )}
             {phase === "storytelling" && (
-              <IntroScreen
+              <StorytellingScreen
                 onBegin={() => dispatch({ type: "tutorial" })}
                 isPaused={paused}
               />
             )}
             {phase === "tutorial" && (
-              <BatcomputerBootOverlay
+              <TutorialScreen
                 onComplete={() => dispatch({ type: "start" })}
               />
             )}
             {playing && (
               <ErrorBoundary key={run + scene} onExit={goStatue}>
-                <Panorama
+                <GamificationScreen
                   key={run + scene}
                   scene={scene}
                   onProgress={(count) => dispatch({ type: "progress", count })}
@@ -268,7 +270,7 @@ function Experience() {
               </ErrorBoundary>
             )}
             {transition && !failed && (
-              <Transition
+              <SkipTransitionScreen
                 key={phase}
                 src={
                   phase === "transition1"
@@ -281,11 +283,15 @@ function Experience() {
               />
             )}
             {phase === "reveal" && (
-              <MissionResult won seconds={state.time} onContinue={goStatue} />
+              <MissionResultScreen
+                won
+                seconds={state.time}
+                onContinue={goStatue}
+              />
             )}
-            {phase === "showreel" && <Statue onPreorder={goCheckout} />}
+            {phase === "showreel" && <ShowreelScreen onPreorder={goCheckout} />}
             {phase === "checkout" && (
-              <Checkout
+              <CheckoutScreen
                 onSuccess={(quantity, total) => {
                   dispatch({ type: "purchase", order: { quantity, total } });
                   history.pushState(null, "", "#conferma");
@@ -293,7 +299,7 @@ function Experience() {
               />
             )}
             {phase === "thankyou" && state.order && (
-              <Confirmation onReturnHome={() => navigate("start")} />
+              <ThankYouScreen onReturnHome={() => navigate("start")} />
             )}
             {status === "active" && (
               <JokerAudio
@@ -304,7 +310,7 @@ function Experience() {
             )}
           </Suspense>
           {failed && (
-            <MissionResult
+            <MissionResultScreen
               won={false}
               seconds={0}
               onContinue={() => navigate("start")}

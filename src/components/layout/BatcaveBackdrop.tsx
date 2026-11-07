@@ -37,7 +37,7 @@ export default function BatcaveBackdrop() {
 
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(
-        75,
+        88,
         window.innerWidth / window.innerHeight,
         0.1,
         1000,

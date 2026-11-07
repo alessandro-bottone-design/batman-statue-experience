@@ -11,7 +11,15 @@ async function enterStory(page: Page) {
 }
 async function enterTutorial(page: Page) {
   await enterStory(page);
-  await page.getByRole("button", { name: "SALTA INTRO" }).click();
+  await page
+    .getByRole("button", {
+      name: "Interagisci con il reperto per decifrare il messaggio",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("button", { name: "ACCETTA LA SFIDA", exact: true })
+    .click();
 }
 async function beginMission(page: Page) {
   const next = page.getByRole("button", { name: "Istruzione successiva" });
@@ -190,13 +198,10 @@ test("official start has original assets, tokens and an inert decorative video",
   await page.mouse.move(1910, 1070);
   await page.screenshot({ path: test.info().outputPath("start.png") });
 });
-test("storytelling plays all frames, pauses on time and can skip directly to tutorial", async ({
+test("storytelling flips the Joker relic card, hides the guide subtitle and advances to tutorial", async ({
   page,
 }) => {
-  const base = new Date("2026-11-02T12:00:00Z");
-  await page.clock.install({ time: base });
   await page.goto("/");
-  await page.clock.pauseAt(new Date(base.getTime() + 60000));
   await page
     .getByRole("button", { name: "INIZIA LA MISSIONE", exact: true })
     .click();
@@ -205,36 +210,35 @@ test("storytelling plays all frames, pauses on time and can skip directly to tut
     "src",
     BATCOMPUTER_VIDEO,
   );
+  const card = page.locator(".ds-story-card");
+  await expect(card).toHaveAttribute("data-face", "front");
   await expect(page.getByRole("heading")).toContainText(
-    "HO LASCIATO UN REGALINO",
+    "INTERAGISCI CON IL REPERTO",
   );
-  await page.clock.runFor(4000);
   await page.getByRole("button", { name: "Metti in pausa esperienza" }).click();
   await expect(
     page.getByRole("heading", { name: "MISSIONE IN PAUSA" }),
   ).toBeVisible();
-  await page.clock.runFor(50000);
   await page.getByRole("button", { name: "Riprendi esperienza" }).click();
-  await expect(page.getByRole("heading")).toContainText(
-    "HO LASCIATO UN REGALINO",
+  await expect(card).toHaveAttribute("data-face", "front");
+  await page
+    .getByRole("button", {
+      name: "Interagisci con il reperto per decifrare il messaggio",
+      exact: true,
+    })
+    .click();
+  await expect(card).toHaveAttribute("data-face", "back");
+  await expect(
+    page.getByRole("heading", { name: /INTERAGISCI CON IL REPERTO/ }),
+  ).toHaveCount(0);
+  await expect(page.locator(".ds-story-card-body")).toContainText(
+    "Batman... Ho lasciato un regalino",
   );
-  await page.clock.runFor(1100);
-  await expect(page.getByRole("heading")).toContainText("RISOLVI IL GIOCO");
-  for (const copy of [
-    "NON È IL SOLITO GIOCATTOLO",
-    "IL TEMPO SCORRE",
-    "TROVA I MIEI 5 INDIZI",
-  ]) {
-    await page.clock.runFor(5000);
-    await expect(page.getByRole("heading")).toContainText(copy);
-  }
-  await expect(page.getByRole("button", { name: "SALTA INTRO" })).toHaveCount(
-    0,
-  );
-  await page.clock.runFor(5000);
-  const accept = page.getByRole("button", { name: "ACCETTA LA SFIDA" });
+  const accept = page.getByRole("button", {
+    name: "ACCETTA LA SFIDA",
+    exact: true,
+  });
   await expect(accept).toBeVisible();
-  await page.clock.runFor(20000);
   await accept.click();
   await expect(
     page.getByRole("heading", { name: "BATTI IL TEMPO" }),
@@ -653,30 +657,25 @@ test("showreel paints without scrolling, bounds requests and recovers after miss
   await expect(
     page.getByRole("heading", { name: "PRESENZA LEGGENDARIA" }),
   ).toBeVisible();
+  await expect(page.locator(".ds-showreel-right .ds-showreel-card")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Metti in pausa esperienza" }),
+  ).toHaveCount(0);
   await page.evaluate(() =>
     window.scrollTo(0, (document.body.scrollHeight - innerHeight) * 0.4),
   );
   await expect(
     page.getByRole("heading", { name: "MATERIALI D’ELITE" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Metti in pausa esperienza" }).click();
-  const pausedAt = await page.evaluate(() => scrollY);
-  await expect(
-    page.getByRole("heading", { name: "MISSIONE IN PAUSA" }),
-  ).toBeVisible();
-  await page.mouse.wheel(0, 1000);
-  await page.keyboard.press("PageDown");
-  await expect.poll(() => page.evaluate(() => scrollY)).toBe(pausedAt);
-  await page.getByRole("button", { name: "Riprendi esperienza" }).click();
-  await expect(
-    page.getByRole("heading", { name: "MATERIALI D’ELITE" }),
-  ).toBeVisible();
+  await expect(page.locator(".ds-showreel-left .ds-showreel-card")).toBeVisible();
+  await expect(page.locator(".statue-stage")).toHaveAttribute("data-step", "2");
   await page.evaluate(() =>
     window.scrollTo(0, (document.body.scrollHeight - innerHeight) * 0.7),
   );
   await expect(
     page.getByRole("heading", { name: "SCULTURA DI PRECISIONE" }),
   ).toBeVisible();
+  await expect(page.locator(".ds-showreel-right .ds-showreel-card")).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await expect(
     page
@@ -732,7 +731,7 @@ test("failed videos fall back to images and transitions can continue", async ({
     await answer(page, id, responses[id - 1]);
     if (id === 2 || id === 3)
       await page
-        .getByRole("button", { name: "Accedi alla prossima area" })
+        .getByRole("button", { name: "SALTA LA TRANSIZIONE" })
         .click();
   }
   await expect(
@@ -800,7 +799,17 @@ test("axe checks official start, tutorial, checkout, confirmation and static sho
   await page.goto("/");
   await check();
   await page.getByRole("button", { name: "INIZIA LA MISSIONE" }).click();
-  await page.getByRole("button", { name: "SALTA INTRO" }).click();
+  await check();
+  await page
+    .getByRole("button", {
+      name: "Interagisci con il reperto per decifrare il messaggio",
+      exact: true,
+    })
+    .click();
+  await check();
+  await page
+    .getByRole("button", { name: "ACCETTA LA SFIDA", exact: true })
+    .click();
   await check();
   await page.goto("/#checkout");
   await check();

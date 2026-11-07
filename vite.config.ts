@@ -11,6 +11,7 @@ export default defineConfig({
   },
   build: {
     minify: "esbuild",
+    chunkSizeWarningLimit: 1200,
     rolldownOptions: { input: { index: "index.html", notFound: "404.html" } },
   },
 });

@@ -9,17 +9,17 @@ Questo file definisce le regole operative vincolanti per il progetto **Batman St
 ### Ambito di applicazione: le schermate con UI su ambiente Batcomputer
 Nelle schermate in cui l'interfaccia utente (UI) è posizionata al di sopra dell'ambiente Batcomputer (`public/assets/textures/BatCaverna_Batcomputer360.mp4` / `.jpg`):
 1. **Start Screen** (`StartScreen`)
-2. **Storytelling** (Monologo Joker in `IntroScreen`)
-3. **Briefing** (Accetta la sfida in `IntroScreen`)
-4. **Tutorial Tappa 1** — "Batti il tempo" (`BatcomputerBootOverlay`)
-5. **Tutorial Tappa 2** — "Risolvi gli enigmi" (`BatcomputerBootOverlay`)
-6. **Tutorial Tappa 3** — "Trova tutti gli indizi" (`BatcomputerBootOverlay`)
-7. **Tutorial Tappa 4** — "Esplora l'ambiente" (`BatcomputerBootOverlay`)
+2. **Storytelling** (Monologo Joker in `StorytellingScreen`)
+3. **Briefing** (Accetta la sfida in `StorytellingScreen`)
+4. **Tutorial Tappa 1** — "Batti il tempo" (`TutorialScreen`)
+5. **Tutorial Tappa 2** — "Risolvi gli enigmi" (`TutorialScreen`)
+6. **Tutorial Tappa 3** — "Trova tutti gli indizi" (`TutorialScreen`)
+7. **Tutorial Tappa 4** — "Esplora l'ambiente" (`TutorialScreen`)
 8. **Schermata di Pausa** (`PauseOverlay`)
-9. **Esito Missione** — Vittoria o Sconfitta (`MissionResult`)
-10. **Checkout** — 4 tappe compilazione (`Checkout`)
-11. **Thank You Page** / Conferma preordine (`ThankYouPage`)
-12. **Errore 404** / Frequenza smarrita (`NotFound`)
+9. **Esito Missione** — Vittoria o Sconfitta (`MissionResultScreen`)
+10. **Checkout** — 4 tappe compilazione (`CheckoutScreen`)
+11. **Thank You Page** / Conferma preordine (`ThankYouScreen`)
+12. **Errore 404** / Frequenza smarrita (`NotFoundScreen`)
 
 ### Regola vincolante:
 > **L'ambiente 3D deve essere sempre "chiuso" con panorama a 360 gradi (proiezione sferica prospettica 3D), MAI "aperto" come video o immagine equirettangolare 2D piana.**
@@ -28,7 +28,7 @@ Nelle schermate in cui l'interfaccia utente (UI) è posizionata al di sopra dell
   - È severamente vietato visualizzare il file equirettangolare 2:1 (`BatCaverna_Batcomputer360.mp4` / `.jpg`) tramite un semplice tag `<video>` o `background-image` HTML piatto con `object-fit: cover`. Questa modalità srotola la sfera equirettangolare in 2D ("aperta"), producendo gravi deformazioni prospettiche e curvature anomale del pavimento (distorsione polare/nadir), come avveniva precedentemente nella schermata Checkout.
 
 - **COSA È RICHIESTO ("Ambiente chiuso con panorama a 360°")**:
-  - L'ambiente deve essere proiettato su una geometria sferica 3D (`sphereGeometry` Three.js con normale invertita / `BackSide`) osservata dall'interno con camera prospettica (`PerspectiveCamera`), esattamente come avviene per il modulo di esplorazione 3D (`SharedPanoramaCanvas`).
+  - L'ambiente deve essere proiettato su una geometria sferica 3D (`sphereGeometry` Three.js con normale invertita / `BackSide`) osservata dall'interno con camera prospettica (`PerspectiveCamera`), esattamente come avviene per il modulo di esplorazione 3D (`GamificationScreen`).
   - La visuale deve mantenere le linee rette prospettiche dell'architettura della Batcaverna senza distorsioni sferiche equirettangolari visibili.
   - Sulle schermate touch/mobile prive di supporto WebGL desktop, mantenere il fallback statico ottimizzato e privo di distorsioni visibili.
 

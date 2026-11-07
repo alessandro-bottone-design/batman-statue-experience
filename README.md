@@ -1,31 +1,51 @@
 # Batman Statue Experience
 
-Esperienza multimediale e interattiva per desktop ideata e progettata da Alessandro Bottone. L'applicazione presenta la Batman Statue Experience attraverso un'esplorazione investigativa a 360° della Batcaverna con cinque enigmi del Joker, la presentazione cinematica della statua da collezione Sideshow a 800 frame e un checkout dimostrativo accessibile.
+**Prototipo interattivo di un'esperienza di acquisto immersiva in modalità desktop**, ideato e progettato da **Alessandro Bottone** su **Figma** (Design System e tavole di prototipo) e implementato mediante **tool di AI Generativa (Antigravity)**.
 
-> **Avviso accademico**: il sito è un progetto di design UI/UX e non costituisce un negozio reale. La procedura di preordine e il checkout sono simulazioni locali: utilizzare esclusivamente dati fittizi.
+L'applicazione trasforma il preordine della *Batman Statue* (DC × Sideshow × Queen Studios) in un percorso esperienziale su desktop che integra storytelling interattivo, esplorazione investigativa a 360° della Batcaverna con cinque enigmi del Joker, showreel scrollytelling a 800 fotogrammi e checkout guidato in 4 tappe.
+
+> **Contesto accademico**: progetto realizzato per l'esame di UI/UX Design (*"Realizzazione di un prototipo interattivo di una esperienza di acquisto immersiva in modalità desktop"*, valutazione massima del prototipo: **27/30**). Il flusso di preordine e il checkout sono simulazioni locali del prototipo interattivo: non viene effettuata alcuna transazione reale né trasmissione di dati personali.
 
 - **Repository GitHub**: [https://github.com/alessandro-bottone-design/batman-statue-experience](https://github.com/alessandro-bottone-design/batman-statue-experience)
-- **Sito web pubblico**: [https://batman-statue-experience.vercel.app/](https://batman-statue-experience.vercel.app/)
+- **Prototipo web pubblico (Vercel)**: [https://batman-statue-experience.vercel.app/](https://batman-statue-experience.vercel.app/)
+- **File Figma — Design System (`64:1521`)**: [BatmanStatueExperience_DesignSystem — Design System](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=64-1521&m=dev)
+- **File Figma — Tavole di Prototipo (`361:5043`)**: [BatmanStatueExperience_DesignSystem — Prototipo](https://www.figma.com/design/HNqMZbAGUnygNJu9kVJzOc/BatmanStatueExperience_DesignSystem?node-id=361-5043&m=dev)
 
 ---
 
-## Caratteristiche Principali & Regole Architetturali
+## Obiettivi di Progetto e Criteri di Valutazione Accademica
+
+Il prototipo interattivo, sviluppato con **Antigravity** (AI Generativa) in corrispondenza 1:1 con il file Figma, risponde puntualmente ai sette criteri di valutazione del progetto d'esame:
+
+| Criterio di Valutazione | Implementazione nel Prototipo Interattivo |
+|---|---|
+| **1. Idea Progettuale** | Esperienza d'acquisto immersiva *Tech-Noir* su desktop che unisce gamification investigativa 3D a 360° nella Batcaverna, scrollytelling cinematografico a 800 frame della statua e checkout multi-step. |
+| **2. Buyer Personas e Coerenza** | Target collezionisti *high-end* e appassionati DC/Batman su postazione **desktop** (tutelata dal gate `MobileNotice` / `mobile-advisor` sui dispositivi touch). Tono visivo e narrativo coerente dall'interazione col reperto del Joker fino alla conferma ordine. |
+| **3. Bias Cognitivi e Coerenza** | • **Scarcity & Urgency**: conto alla rovescia di `03:00` (`Timer`) per disinnescare la minaccia.<br>• **IKEA Effect / Effort Justification**: conquista attiva dell'accesso allo showreel risolvendo i 5 enigmi (*"L'EREDITÀ È TUA"*).<br>• **Goal Gradient Effect**: `progress-bar` indizi (`0/5` → `5/5`) e checkout frazionato in 4 tappe.<br>• **Framing & Anchoring**: valorizzazione museale tramite le `showreel-card` prima dell'ancoraggio di prezzo (`700€` + `50€` spedizione = `750€`). |
+| **4. Tecniche di Attenzione e Coerenza** | • **Contrasto selettivo su fondo `#010013`**: accenti semantici Giallo Batman (`#FFD700`) e Viola Joker (`#A64DFF`) con bagliori multi-livello (`glare`).<br>• **Motion & Micro-interazioni**: `batman-loading-animation` con tracciato luminoso e respiro, flip 3D (`rotateY`) su `storytelling-card` e `card`, cursore a pipistrello e `JokerHintSystem` spazializzato.<br>• **Ritmo visivo nello Showreel**: alternanza `destra` → `sinistra` (con traslazione di bilanciamento della statua) → `destra` delle `showreel-card`. |
+| **5. Gestione dei Token di Colore** | Mappatura rigorosa 1:1 tra i token Figma (`#010013`, `#FAF9F6`, `#FFD700`, `#A64DFF`) e le variabili CSS globali (`--black`, `--white`, `--yellow`, `--purple`, `--glare-yellow`, `--glare-purple`). |
+| **6. Gestione dei Components** | Libreria centralizzata in Figma (`64:1521`) e in `src/components/ui/DesignSystem.tsx`: `button`, `icon-button`, `timer`, `progress-bar`, `logos-navbar`, `navbar`, `input-bar`, `radio-button`, `card`, `storytelling-card`, `tutorial-card`, `showreel-card`, `batman-loading-animation`, `mouse-scroll`. |
+| **7. Gestione Istanze nelle Tavole di Prototipo** | Tutte le 14 tavole del prototipo Figma (`361:5043`) istanziano i componenti master senza override arbitrari e sono tracciate nel DOM tramite attributi `data-figma-node`. |
+
+---
+
+## Caratteristiche Tecniche Principali
 
 1. **Ambiente 3D Panorama 360° Chiuso (Three.js)**:
-   - Sia durante l'esplorazione investigativa (`SharedPanoramaCanvas.tsx`) sia nelle schermate con interfaccia utente in overlay (`BatcaveBackdrop.tsx` per Start, Intro, Tutorial, Pausa, Risultati, Checkout, Thank You, 404), la Batcaverna è sempre proiettata all'interno di una geometria sferica 3D (`SphereGeometry` invertita con `PerspectiveCamera`), garantendo linee rette architettoniche naturali e l'assoluta assenza di distorsioni polari o nadir equirettangolari 2D.
+   - Sia durante l'esplorazione investigativa (`GamificationScreen.tsx`) sia nelle schermate con interfaccia utente in overlay (`BatcaveBackdrop.tsx` per Start, Storytelling, Tutorial, Pausa, Esito Missione, Checkout, Thank You, 404), la Batcaverna è proiettata all'interno di una geometria sferica 3D (`SphereGeometry` con `PerspectiveCamera`), preservando le linee prospettiche dell'architettura senza distorsioni equirettangolari 2D.
 2. **Design System & Navbar Trasparente**:
-   - Navbar (`.ds-navbar`) completamente trasparente a tutto schermo (`inset: 0`), HUD integrato e token visivi fedeli al Design System Figma ufficiale.
+   - Navbar (`.ds-navbar`) completamente trasparente a filo superiore (`inset: 0`) con loghi ufficiali `logos-navbar`, HUD di missione e controlli contestuali per ogni schermata.
 3. **Sound Design Immersivo Web Audio**:
-   - Colonna sonora procedurale Gotham, battito d'allarme, risate spazializzate del Joker e feedback sonori sintetizzati.
-4. **Showreel Interattivo 800 Frame**:
-   - Visualizzatore dinamico a 800 frame WebP della statua Sideshow Batman 87th Anniversary, con scrubber temporale e rotazione a 360°.
+   - Tema musicale di sottofondo, risata spazializzata del Joker con riverbero procedurale di caverna (attivata allo sblocco del reperto in Storytelling e nei suggerimenti in missione) e feedback sonori sintetizzati.
+4. **Showreel Interattivo a 800 Frame**:
+   - Sequenza di 800 fotogrammi WebP controllata dallo scorrimento con cache LRU, prefetching concorrente limitato e `showreel-card` alternate.
 
 ---
 
 ## Avvio Locale
 
 ### Prerequisiti
-- **Node.js**: versione 22.12+ o 24 LTS (l'ambiente di hosting Vercel e la CI GitHub Actions adottano Node 24).
+- **Node.js**: versione 22.12+ o 24 LTS.
 - **npm**: versione inclusa con Node.js.
 
 ### Installazione e avvio del server di sviluppo
@@ -56,84 +76,67 @@ npm run preview
 # Controllo rapido: typecheck TypeScript, lint ESLint, test unitari e build
 npm run check
 
-# Installazione dei browser Playwright (Chromium, Firefox, WebKit)
-./node_modules/.bin/playwright install chromium
+# Build della fixture isolata del Design System
+npm run build:ds-fixture
 
 # Suite end-to-end completa con Playwright
-./node_modules/.bin/playwright test --project=chromium
+npm run test:e2e
 ```
 
 ---
 
-## Mappa delle Cartelle (Architettura Pulita)
+## Mappa delle Cartelle
 
 ```
 .
-├── src/                          # Codice sorgente attivo dell'applicazione
+├── src/                          # Codice sorgente del prototipo interattivo
 │   ├── components/               # Componenti condivisi
 │   │   ├── layout/               # Elementi strutturali globali
-│   │   │   ├── Navbar.tsx        # Navbar trasparente adattiva con switch audio
+│   │   │   ├── Navbar.tsx        # Navbar trasparente adattiva per tutte le varianti Figma
 │   │   │   └── BatcaveBackdrop.tsx # Ambiente sferico 360° chiuso Three.js per le schermate UI
-│   │   └── ui/                   # Token e componenti Design System Figma
-│   │       ├── DesignSystem.tsx  # Button, IconButton, Timer, Logos, Cursor
+│   │   └── ui/                   # Token e componenti Design System Figma (64:1521)
+│   │       ├── DesignSystem.tsx  # Button, IconButton, Timer, Logos, Cursor, LoadingScreen, MobileNotice
 │   │       ├── ErrorBoundary.tsx # Fallback per errori di runtime
-│   │       ├── FormInput.tsx     # Campi form accessibili con validazione
-│   │       └── PauseOverlay.tsx  # Schermata di pausa missione
-│   ├── features/                 # Moduli funzionali organizzati per flusso utente
-│   │   ├── intro/                # Schermata di avvio, storytelling Joker, tutorial Batcomputer
-│   │   │   ├── StartScreen.tsx   # Schermata iniziale con CTA di inizio
-│   │   │   ├── IntroScreen.tsx   # Monologo Joker e briefing missione
-│   │   │   └── BatcomputerBootOverlay.tsx # Tutorial a 4 step
-│   │   ├── mission/              # Esplorazione 360° investigativa
-│   │   │   ├── SharedPanoramaCanvas.tsx # Canvas Three.js con texture 360° e carte in-world
-│   │   │   ├── CinematicVideoPlayer.tsx # Riproduzione transizioni video
-│   │   │   ├── JokerCard.tsx     # Carte indizio 3D animate con domande a risposta multipla
-│   │   │   ├── JokerAudioManager.tsx # Gestione risate e battute Joker
-│   │   │   ├── JokerHintSystem.tsx # Suggerimenti progressivi
+│   │       ├── FormInput.tsx     # Input-bar accessibili con stati Figma
+│   │       └── PauseOverlay.tsx  # Pause Screen (302:3162)
+│   ├── features/                 # Moduli funzionali organizzati per tavola di prototipo (361:5043)
+│   │   ├── intro/                # Start, Storytelling e Tutorial a 4 tappe
+│   │   │   ├── StartScreen.tsx   # Start Screen (302:3155)
+│   │   │   ├── StorytellingScreen.tsx # Storytelling Screen con storytelling-card 3D (353:3406)
+│   │   │   └── TutorialScreen.tsx # Tutorial Screen a 4 step (314:2104)
+│   │   ├── mission/              # Esplorazione 360° investigativa e transizioni
+│   │   │   ├── GamificationScreen.tsx # Gamification Screen 360° con 5 indizi in-world (296:1030)
+│   │   │   ├── SkipTransitionScreen.tsx # Skip Transition Screen (359:4034)
+│   │   │   ├── JokerCard.tsx     # Componente card 3D fronte/retro con 4 stati risposta (264:1476)
+│   │   │   ├── JokerAudioManager.tsx # Audio ambientale risate Joker durante la missione
+│   │   │   ├── JokerHintSystem.tsx # Tecnica di attenzione con indizio sonoro/visivo
 │   │   │   ├── MouseLookControls.tsx # Controlli panoramica mouse e tastiera
-│   │   │   ├── MissionResult.tsx # Schermata di esito (vittoria / fallimento)
-│   │   │   └── useJokerHint.ts   # Hook di temporizzazione indizi
-│   │   ├── showreel/             # Galleria 800 frame statua
-│   │   │   └── BatmanCamera.tsx  # Visualizzatore fotogrammi statua interattivo
-│   │   ├── checkout/             # Flusso di preordine in 4 step (750 €)
-│   │   │   ├── Checkout.tsx      # Form di preordine (Dati, Spedizione, Pagamento, Riepilogo)
-│   │   │   ├── ThankYouPage.tsx  # Schermata di conferma ordine con dati riepilogativi
-│   │   │   └── checkoutModel.ts  # Modello dati e validazione form
-│   │   └── not-found/            # Pagina 404 (Frequenza smarrita)
-│   │       └── NotFound.tsx      # Schermata di fallback con navigazione verso la Home
+│   │   │   ├── MissionResultScreen.tsx # Win Screen (302:3160) e Lose Screen (302:3161)
+│   │   │   └── useJokerHint.ts   # Hook di temporizzazione suggerimenti
+│   │   ├── showreel/             # Showreel 800 frame statua (357:3713)
+│   │   │   └── ShowreelScreen.tsx # Scrollytelling 800 frame con showreel-card alternate (357:3522)
+│   │   ├── checkout/             # Checkout in 4 tappe (315:4645) e Thank You Screen (302:3209)
+│   │   │   ├── CheckoutScreen.tsx # Dati personali, Spedizione, Pagamento, Riepilogo (750€)
+│   │   │   ├── ThankYouScreen.tsx # Conferma preordine (302:3209)
+│   │   │   └── checkoutModel.ts  # Validazione campi e calcolo totale
+│   │   └── not-found/            # Error 404 Screen (302:3166)
+│   │       └── NotFoundScreen.tsx # Schermata 404 con rientro alla Home
 │   ├── hooks/                    # Hook personalizzati (useDesktop, useMissionTimer)
-│   ├── lib/                      # Motore di stato (experience.ts), checkout demo e sound engine
-│   ├── index.css                 # Stili globali, token visivi e variabili CSS
-│   ├── main.tsx                  # Entry point dell'applicazione React
-│   └── App.tsx                   # Orchestratore principale della macchina a stati
-├── public/                       # Risorse statiche servite direttamente
-│   ├── assets/                   # Audio (WAV), video (MP4), texture 360°, font, frame statua
-│   ├── favicon.svg               # Favicon vettoriale ufficiale Figma (Frame 440)
-│   └── favicon.ico               # Favicon multi-risoluzione
-├── tests/                        # Suite di collaudo
-│   ├── browser/                  # Test e2e Playwright
-│   ├── fixtures/                 # Pagina e fixture isolata per i componenti
-│   └── experience.test.ts        # Test unitari Node.js su state machine e validazione checkout
-├── docs/                         # Documentazione tecnica attiva di progetto
-│   ├── ARCHITETTURA_E_DESIGN_SYSTEM.md # Architettura React/Three.js, stato, audio e token Figma
-│   ├── ESPERIENZA_E_CHECKOUT.md  # Macchina a stati, gameplay 360°, enigmi Joker e checkout
-│   ├── VERIFICA_E_RILASCIO.md    # Suite di collaudo, CI GitHub Actions e deploy Vercel
-│   ├── CHANGELOG.md              # Storico ragionato delle versioni
-│   ├── figma/                    # Specifiche e manifest degli asset Figma
-│   └── archivio/                 # Archivio storico di guide, audit e bozze iniziali
-├── AGENTS.md                     # Regole operative vincolanti per AI Agents
-├── vercel.json                   # Configurazione deployment e routing Vercel
-├── vite.config.ts                # Configurazione bundling Vite
-└── package.json                  # Script e dipendenze di progetto
+│   ├── lib/                      # State machine (experience.ts) e Web Audio engine (audioManager.ts)
+│   ├── index.css                 # Token di colore, tipografia, glare e layout Figma
+│   ├── main.tsx                  # Entry point React
+│   └── App.tsx                   # Orchestratore principale del prototipo
+├── public/                       # Risorse statiche (audio WAV, video MP4, texture 360°, 800 WebP, font)
+├── tests/                        # Suite di verifica unitaria, componenti ed E2E Playwright
+├── docs/                         # Documentazione unificata e manifest Figma
+│   ├── DOCUMENTAZIONE_PROGETTO.md # Documento unico completo (Concept, UX/UI, Token, Components, Istanze, Test, Changelog)
+│   └── figma/assets.json         # Manifest di tracciabilità degli asset Figma
+└── AGENTS.md                     # Regole operative vincolanti per l'implementazione con Antigravity
 ```
 
 ---
 
 ## Documentazione di Approfondimento
 
-- [**Architettura e Design System**](docs/ARCHITETTURA_E_DESIGN_SYSTEM.md): stato applicativo, rendering Three.js, audio engine e specifiche dei token Figma.
-- [**Esperienza utente e Checkout**](docs/ESPERIENZA_E_CHECKOUT.md): regole di gioco, controlli da tastiera, proiezioni 360°, checkout a 4 tappe e schermata 404.
-- [**Verifica e Rilascio**](docs/VERIFICA_E_RILASCIO.md): procedure di test, CI/CD, distribuzione su Vercel, promozione e rollback.
-- [**Regole Operative Agenti**](AGENTS.md): vincoli di rendering 3D sferico chiuso e trasparenza navbar.
-- [**Changelog**](docs/CHANGELOG.md): evoluzione e release note del progetto.
-- [**Archivio Storico**](docs/archivio/README.md): consultazione dei materiali e delle iterazioni precedenti.
+- [**Documentazione Completa del Progetto (`docs/DOCUMENTAZIONE_PROGETTO.md`)**](docs/DOCUMENTAZIONE_PROGETTO.md): documento unico e indicizzato che raccoglie Concept Accademico, Idea Progettuale, Buyer Personas, Bias Cognitivi, Tecniche di Attenzione, Token di Colore e Tipografia, Components (`64:1521`), Istanze nelle 14 Tavole di Prototipo (`361:5043`), Architettura 3D 360°, Test Automatizzati e Changelog.
+- [**Regole Operative Agenti (`AGENTS.md`)**](AGENTS.md): vincoli architetturali per l'ambiente 3D sferico chiuso a 360° e la trasparenza della navbar.

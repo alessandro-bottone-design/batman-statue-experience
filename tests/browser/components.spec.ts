@@ -106,7 +106,12 @@ test("input and in-place card expose the official focus, value, error and succes
   await page.getByRole("button", { name: "Apri indizio 99" }).click();
   await expect(page.locator(".ds-clue-back")).toBeVisible();
   await expect(page.locator(".ds-clue-front")).toBeHidden();
-  await page.getByRole("button", { name: "Joker", exact: true }).click();
+  const jokerOption = page.getByRole("button", { name: "Joker", exact: true });
+  await jokerOption.hover();
+  await expect(jokerOption).toHaveCSS("background-color", "rgb(1, 0, 19)");
+  await expect(jokerOption).toHaveCSS("color", "rgb(250, 249, 246)");
+  await expect(jokerOption).toHaveCSS("outline-color", "rgb(250, 249, 246)");
+  await jokerOption.click();
   await expect(page.getByText("RISPOSTA ERRATA")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Joker", exact: true }),

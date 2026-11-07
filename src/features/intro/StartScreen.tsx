@@ -1,13 +1,12 @@
-import { Button, Logos } from "../../components/ui/DesignSystem";
+import { Button } from "../../components/ui/DesignSystem";
 export default function StartScreen({ onStart }: { onStart: () => void }) {
   return (
     <section
       className="ds-start"
-      data-figma-node="239:3262"
+      data-figma-node="302:2447"
       aria-labelledby="start-title"
     >
       <div className="ds-start-stack">
-        <Logos plain />
         <div className="ds-start-title">
           <h1 id="start-title" className="ds-display ds-glow-text">
             BATMAN
