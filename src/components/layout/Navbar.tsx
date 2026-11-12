@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { Button, IconButton, Logos, Timer } from "../ui/DesignSystem";
 
 export type NavPhase =
@@ -23,6 +23,7 @@ type Props = {
   onPreorder?: () => void;
   completedCount?: number;
   timeLeft?: number;
+  progressTrack?: RefObject<HTMLSpanElement | null>;
 };
 
 export default function Navbar({
@@ -34,6 +35,7 @@ export default function Navbar({
   onPreorder,
   completedCount = 0,
   timeLeft = 180,
+  progressTrack,
 }: Props) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -81,15 +83,13 @@ export default function Navbar({
               <span className="ds-body-small-space">INDIZI RACCOLTI</span>
               <div>
                 <span className="ds-caption">{completedCount} / 5</span>
-                <span className="ds-progress-track">
+                <span className="ds-progress-track" ref={progressTrack}>
+                  <span
+                    className="ds-progress-fill"
+                    style={{ width: `${completedCount * 20}%` }}
+                  />
                   {completedCount > 0 && (
-                    <span
-                      style={
-                        {
-                          "--progress-asset": `url(/assets/ds/progress-${completedCount === 5 ? "full" : completedCount}.svg)`,
-                        } as CSSProperties
-                      }
-                    />
+                    <span key={completedCount} className="ds-progress-pulse" />
                   )}
                 </span>
               </div>
@@ -110,6 +110,7 @@ export default function Navbar({
               aria-label={isMuted ? "Attiva audio" : "Silenzia audio"}
               aria-pressed={isMuted}
               onClick={onToggleMute}
+              data-ui-sound="custom"
             />
           )}
           {showPause && (
