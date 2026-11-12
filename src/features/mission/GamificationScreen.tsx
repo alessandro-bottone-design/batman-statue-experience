@@ -153,8 +153,10 @@ export default function GamificationScreen({
     else resetHint();
   }, [riddles, completed, active, startHintTimer, resetHint]);
   useEffect(() => {
+    if (graphics !== "available") return;
     let alive = true,
-      fallback = false;
+      fallback = false,
+      playingVideo = false;
     const textures = new Set<THREE.Texture>();
     setLoading(true);
     setFailed(false);
@@ -208,7 +210,9 @@ export default function GamificationScreen({
     const tex = new THREE.VideoTexture(el);
     textures.add(tex);
     const playing = () => {
-      if (!fallback) ready(tex);
+      if (fallback) return;
+      playingVideo = true;
+      ready(tex);
     };
     el.addEventListener("playing", playing);
     el.addEventListener("error", loadStatic);
@@ -218,7 +222,7 @@ export default function GamificationScreen({
       void el.play().catch(loadStatic);
     }
     const timeout = setTimeout(() => {
-      if (el.readyState < 2) loadStatic();
+      if (!playingVideo) loadStatic();
     }, 8000);
     return () => {
       alive = false;
@@ -232,13 +236,13 @@ export default function GamificationScreen({
       for (const item of textures) item.dispose();
       onReady?.(false);
     };
-  }, [scene, retry, reduced, onReady]);
+  }, [scene, retry, reduced, graphics, onReady]);
   useEffect(() => {
     const el = video.current;
     if (!el || reduced || !el.getAttribute("src")) return;
     if (isPaused) el.pause();
     else void el.play().catch(() => {});
-  }, [isPaused, reduced]);
+  }, [isPaused, reduced, graphics, retry]);
   const complete = useCallback(
     (id: number) => {
       if (completed.includes(id) || isPaused) return;

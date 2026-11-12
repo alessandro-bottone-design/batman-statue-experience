@@ -1,7 +1,6 @@
-# Strumenti di manutenzione supportati
+# Strumenti di manutenzione
 
-- `open-site.command`: avvia la build locale via HTTP servita con preview locale. Non aprire `dist/index.html` tramite `file://`: la build usa moduli ES e chunk asincroni.
-- `extract-frame.mjs`: utility di manutenzione per estrarre o rigenerare i JPG delle panoramiche a 360° dai video MP4; richiede FFmpeg installato nel PATH.
+- Su macOS, `./scripts/open-site.command` crea una build aggiornata, avvia la preview su `http://127.0.0.1:4173` e apre il browser. Per modificare il sito con ricarica automatica usa `npm run dev`.
+- `node scripts/extract-frame.mjs` rigenera i tre JPG equirettangolari a partire dai video delle scene e la vista prospettica del Batcomputer usata quando WebGL non è disponibile. Richiede FFmpeg con filtro `v360` nel PATH e sovrascrive i quattro JPG in `public/assets/textures/`.
 
-Gli script ritirati (`push.sh`, `design-audit.cjs`, `test-app.js` e le conversioni video `convert_*.sh`) sono archiviati in `docs/archivio/scripts/`.
-I test e le verifiche ufficiali sono eseguiti tramite i comandi npm (`npm run check`, `npm run test:e2e`, `npm run build:ds-fixture`).
+Per avvio, test e rilascio consulta la [guida di sviluppo](../docs/SVILUPPO.md).

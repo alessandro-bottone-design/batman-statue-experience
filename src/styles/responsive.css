@@ -1,0 +1,146 @@
+/* Cross-screen layout adjustments and motion preferences. */
+@media (max-width: 1200px) {
+  .ds-navbar {
+    gap: 16px;
+    padding-right: 24px;
+  }
+  .ds-navbar-left {
+    gap: 16px;
+  }
+  .ds-navbar .ds-logos {
+    zoom: 0.7;
+  }
+  .ds-hud {
+    gap: 18px;
+  }
+  .ds-navbar-actions {
+    gap: 20px;
+  }
+  .ds-start {
+    padding-inline: 60px;
+  }
+  .ds-display {
+    font-size: 40px;
+    line-height: 48px;
+  }
+  .ds-thankyou-card dl > div {
+    padding: 20px;
+  }
+}
+@media (max-width: 900px) {
+  .ds-navbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: auto;
+    padding: 12px 16px;
+    align-items: start;
+  }
+  .ds-navbar-left {
+    flex-wrap: wrap;
+  }
+  .ds-navbar .ds-logos {
+    zoom: 0.47;
+    margin-left: -16px;
+  }
+  .ds-hud {
+    flex-wrap: wrap;
+    zoom: 0.8;
+  }
+  .ds-navbar-actions {
+    flex-wrap: wrap;
+    max-width: 210px;
+  }
+  .ds-start {
+    padding-inline: 28px;
+  }
+  .ds-start .ds-logos {
+    zoom: 0.65;
+  }
+  .ds-start-title {
+    min-height: 0;
+    padding: 20px 0;
+  }
+  .ds-storytelling .ds-display {
+    font-size: 30px;
+    line-height: 36px;
+  }
+  .ds-thankyou-card dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .ds-thankyou-card dl > div {
+    padding: 10px;
+    gap: 18px;
+  }
+  [data-phase="checkout"] .ds-navbar-actions,
+  [data-phase="thankyou"] .ds-navbar-actions {
+    margin-right: 0;
+  }
+}
+@media (max-width: 540px) {
+  .ds-checkout-grid,
+  .ds-thankyou-card dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ds-field {
+    min-height: 0;
+    padding-inline: 8px;
+  }
+  .ds-payment-label {
+    padding-inline: 6px;
+    gap: 12px;
+  }
+  .ds-thankyou-card {
+    padding: 24px;
+  }
+  .ds-mobile-page .ds-logos {
+    zoom: 0.42;
+  }
+}
+@media (max-height: 780px) {
+  .ds-checkout,
+  .ds-checkout:has(.ds-checkout-card) {
+    padding-top: 40px;
+    gap: 24px;
+  }
+  .ds-start-stack,
+  .ds-tutorial {
+    gap: 42px;
+  }
+  .ds-result,
+  .ds-thankyou-card {
+    min-height: 0;
+    gap: 28px;
+  }
+}
+@media (max-height: 650px) {
+  .ds-navbar {
+    min-height: 112px;
+  }
+  .ds-navbar .ds-logos {
+    zoom: 0.65;
+  }
+  .ds-centered,
+  .ds-start {
+    padding-block: 30px;
+  }
+  .ds-tutorial-intro {
+    min-height: 240px;
+  }
+}
+@media (max-height: 650px) and (max-width: 900px) {
+  .ds-navbar .ds-logos {
+    zoom: 0.47;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+  .ds-clue-front,
+  .ds-clue-back,
+  .ds-story-card-front,
+  .ds-story-card-back {
+    transition: none;
+  }
+}

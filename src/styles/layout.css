@@ -1,0 +1,225 @@
+.experience-shell {
+  min-height: 100svh;
+  background: var(--screen-background);
+}
+/* A single fixed layer keeps the view independent of the UI and its scroll. */
+.experience-shell:has(> .batcave-backdrop),
+.ds-mobile-page {
+  isolation: isolate;
+  background: transparent;
+}
+.batcave-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--black) url("/assets/textures/BatCaverna_BatcomputerPerspective.jpg")
+    center / cover no-repeat;
+}
+#experience-content {
+  position: relative;
+  z-index: 10;
+}
+.batcave-backdrop-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  visibility: hidden;
+  z-index: 1;
+}
+.batcave-backdrop-canvas[data-ready="true"] {
+  visibility: visible;
+}
+.batcave-backdrop video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.batcave-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--black) 68%, transparent) 0 26%,
+      transparent 78%
+    ),
+    color-mix(in srgb, var(--black) 40%, transparent);
+}
+.experience-shell[data-paused="true"] > .batcave-backdrop {
+  z-index: 100;
+}
+.ds-pause {
+  background: transparent;
+}
+.ds-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  min-height: 166px;
+  padding-right: 50px;
+  width: 100%;
+  background: transparent;
+  pointer-events: none;
+}
+.ds-navbar-left,
+.ds-hud,
+.ds-navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  pointer-events: auto;
+}
+.ds-navbar-actions {
+  justify-content: flex-end;
+  flex: none;
+}
+[data-phase="checkout"] .ds-navbar-actions,
+[data-phase="thankyou"] .ds-navbar-actions {
+  margin-right: 70px;
+}
+.ds-clue-progress {
+  --tone: var(--purple);
+  --glare-box: var(--glare-box-purple);
+  background: var(--black);
+  color: var(--purple);
+  outline: 2px solid var(--purple);
+  border-radius: 20px;
+  padding: 10px 20px;
+  min-height: 89px;
+  width: 196px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: var(--glare-box);
+  flex: none;
+}
+.ds-clue-progress > div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.ds-clue-progress .ds-caption {
+  width: 35px;
+  white-space: nowrap;
+  flex: none;
+}
+.ds-progress-track {
+  display: block;
+  width: 96px;
+  height: 12px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--purple);
+  overflow: hidden;
+  flex: none;
+}
+.ds-progress-track > span {
+  display: block;
+  width: 96px;
+  height: 12px;
+  background: var(--purple);
+  mask-image: var(--progress-asset);
+  mask-position: left center;
+  mask-repeat: no-repeat;
+}
+.skip-link {
+  position: fixed;
+  top: -150px;
+  left: 20px;
+  z-index: 1000;
+  background: var(--black);
+  border: 2px solid var(--yellow);
+  border-radius: 999px;
+  padding: 10px;
+  font:
+    20px/21px "Space Grotesk",
+    sans-serif;
+}
+.skip-link:focus {
+  top: 20px;
+}
+.ds-centered {
+  min-height: calc(100svh - var(--nav-height));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.ds-pause {
+  position: fixed;
+  inset: var(--nav-height) 0 0;
+  z-index: 150;
+  overflow: auto;
+}
+.ds-mobile-page {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  align-items: center;
+  gap: 24px;
+  min-height: 100svh;
+  padding: 20px;
+  background: var(--screen-background);
+}
+.ds-mobile-page header {
+  justify-self: start;
+}
+.ds-mobile-page .ds-logos {
+  zoom: 0.46;
+}
+.ds-mobile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 334px;
+  max-width: 100%;
+  min-height: 293px;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.ds-cursor {
+  position: fixed;
+  left: -38.5px;
+  top: -25px;
+  width: 77px;
+  height: 50px;
+  pointer-events: none;
+  z-index: 10000;
+}
+.ds-cursor[hidden] {
+  display: none;
+}
+.ds-cursor img {
+  position: absolute;
+  left: -48.364px;
+  top: -33.74px;
+  max-width: none;
+}
+@media (pointer: fine) {
+  .experience-shell:not([data-phase="not-found"]),
+  .experience-shell:not([data-phase="not-found"]) * {
+    cursor: none !important;
+  }
+}

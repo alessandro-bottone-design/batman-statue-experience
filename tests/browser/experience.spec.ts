@@ -138,6 +138,8 @@ async function fill(page: Page, card = false) {
   await next.click();
 }
 const BATCOMPUTER_VIDEO = "/assets/textures/BatCaverna_Batcomputer360.mp4";
+const BATCOMPUTER_PERSPECTIVE =
+  "/assets/textures/BatCaverna_BatcomputerPerspective.jpg";
 const backdrop = (page: Page) => page.locator(".batcave-backdrop");
 const responses = ["BAT SEGNALE", "JOKER", "BATMAN", "BATMOBILE", "REATTORE"];
 test("official start has original assets, tokens and an inert decorative video", async ({
@@ -192,6 +194,7 @@ test("official start has original assets, tokens and an inert decorative video",
   await expect(video).toHaveJSProperty("controls", false);
   await expect(backdrop(page)).toHaveAttribute("inert", "");
   await expect(backdrop(page)).toHaveCSS("pointer-events", "none");
+  await expect(backdrop(page).locator("canvas")).toBeVisible();
   expect(
     media.every((url) => new URL(url).pathname === BATCOMPUTER_VIDEO),
   ).toBe(true);
@@ -239,6 +242,18 @@ test("storytelling flips the Joker relic card, hides the guide subtitle and adva
     exact: true,
   });
   await expect(accept).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  await expect.poll(async () => {
+    return page.locator(".ds-story-card-back").evaluate((back) => {
+      const art = back.querySelector(".ds-story-card-back-art")!;
+      const message = back.querySelector(".ds-story-card-body")!;
+      const button = back.querySelector(".ds-button")!;
+      const artwork = art.getBoundingClientRect();
+      const text = message.getBoundingClientRect();
+      const action = button.getBoundingClientRect();
+      return text.top >= artwork.top + 20 && action.bottom <= artwork.bottom - 20;
+    });
+  }).toBe(true);
   await accept.click();
   await expect(
     page.getByRole("heading", { name: "BATTI IL TEMPO" }),
@@ -479,6 +494,9 @@ test("checkout validates each Figma step, keeps entered values and displays the 
   page,
 }) => {
   await page.goto("/#checkout");
+  await expect(
+    page.getByText("Preordine dimostrativo. Usa solo dati fittizi."),
+  ).toBeVisible();
   await expect(backdrop(page).locator("video")).toHaveAttribute(
     "src",
     BATCOMPUTER_VIDEO,
@@ -577,7 +595,7 @@ test("leaving checkout during processing cancels late confirmation", async ({
     page.getByRole("heading", { name: "ACQUISTO ANDATO A BUON FINE" }),
   ).toHaveCount(0);
 });
-test("phones and touch tablets show the mobile card and only the decorative media", async ({
+test("phones and touch tablets load only the static perspective background", async ({
   browser,
 }) => {
   for (const device of [
@@ -600,10 +618,10 @@ test("phones and touch tablets show the mobile card and only the decorative medi
   ]) {
     const context = await browser.newContext({ ...device, hasTouch: true });
     const page = await context.newPage();
-    const media: string[] = [];
+    const media = new Set<string>();
     page.on("request", (r) => {
       if (/assets\/(audio|videos|textures|showreel|ds\/card)/.test(r.url()))
-        media.push(r.url());
+        media.add(new URL(r.url()).pathname);
     });
     await page.goto(
       (process.env.BASE_URL || "http://127.0.0.1:4173") + "/#checkout",
@@ -611,19 +629,13 @@ test("phones and touch tablets show the mobile card and only the decorative medi
     await expect(
       page.getByRole("heading", { name: "DISPOSITIVO NON COMPATIBILE" }),
     ).toBeVisible();
-    await expect(page.locator("button,nav,canvas,audio")).toHaveCount(0);
+    await expect(page.locator("button,nav,canvas,audio,video")).toHaveCount(0);
     await expect(page.locator(".ds-logos img")).toHaveCount(3);
-    await expect(backdrop(page).locator("video")).toHaveAttribute(
-      "src",
-      BATCOMPUTER_VIDEO,
+    await expect(backdrop(page)).toHaveCSS(
+      "background-image",
+      /BatCaverna_BatcomputerPerspective\.jpg/,
     );
-    expect(
-      media.every(
-        (url) =>
-          new URL(url).pathname === BATCOMPUTER_VIDEO ||
-          new URL(url).pathname.endsWith("/BatCaverna_Batcomputer360.jpg"),
-      ),
-    ).toBe(true);
+    expect([...media]).toEqual([BATCOMPUTER_PERSPECTIVE]);
     await context.close();
   }
 });
@@ -655,34 +667,71 @@ test("showreel paints without scrolling, bounds requests and recovers after miss
     .toBe(true);
   expect(max).toBeLessThanOrEqual(6);
   await expect(
-    page.getByRole("heading", { name: "PRESENZA LEGGENDARIA" }),
-  ).toBeVisible();
-  await expect(page.locator(".ds-showreel-right .ds-showreel-card")).toBeVisible();
-  await expect(
     page.getByRole("button", { name: "Metti in pausa esperienza" }),
   ).toHaveCount(0);
-  await page.evaluate(() =>
-    window.scrollTo(0, (document.body.scrollHeight - innerHeight) * 0.4),
-  );
-  await expect(
-    page.getByRole("heading", { name: "MATERIALI D’ELITE" }),
-  ).toBeVisible();
-  await expect(page.locator(".ds-showreel-left .ds-showreel-card")).toBeVisible();
-  await expect(page.locator(".statue-stage")).toHaveAttribute("data-step", "2");
-  await page.evaluate(() =>
-    window.scrollTo(0, (document.body.scrollHeight - innerHeight) * 0.7),
-  );
-  await expect(
-    page.getByRole("heading", { name: "SCULTURA DI PRECISIONE" }),
-  ).toBeVisible();
-  await expect(page.locator(".ds-showreel-right .ds-showreel-card")).toBeVisible();
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await expect(
-    page
-      .locator("main")
-      .getByRole("button", { name: "PREORDINA IL CAVALIERE" }),
-  ).toBeVisible();
+  const scrollToProgress = (progress: number) =>
+    page.evaluate(
+      (p) => window.scrollTo(0, (document.documentElement.scrollHeight - innerHeight) * p),
+      progress,
+    );
+  const overlays = page.locator(".ds-showreel-overlay:visible");
+  const canvas = page.locator(".statue-stage canvas");
+  const firstCard = page.locator('[data-figma-node="357:3646"]');
+  const finalButton = page.locator("main").getByRole("button", {
+    name: "PREORDINA IL CAVALIERE",
+  });
+  const expectVideoToFillViewport = async () => {
+    const { width, height } = page.viewportSize()!;
+    await expect.poll(() => canvas.boundingBox()).toEqual({ x: 0, y: 0, width, height });
+  };
+
+  await expect(overlays).toHaveCount(0);
+  await expectVideoToFillViewport();
+  await scrollToProgress(0.05);
+  const firstOpacity = () => firstCard.evaluate((el) => Number(getComputedStyle(el).opacity));
+  await expect.poll(firstOpacity).toBeCloseTo(0.5, 1);
+  await scrollToProgress(0.12);
+  await expect(firstCard).toHaveCSS("opacity", "1");
+  await expect(page.locator(".ds-showreel-right:visible .ds-showreel-card")).toHaveCount(1);
+  await scrollToProgress(0.265);
+  await expect.poll(firstOpacity).toBeCloseTo(0.5, 1);
+  await scrollToProgress(0.31);
+  await expect(overlays).toHaveCount(0);
+  await scrollToProgress(0.265);
+  await expect.poll(firstOpacity).toBeCloseTo(0.5, 1);
+  await scrollToProgress(0.12);
+  await expect(firstCard).toHaveCSS("opacity", "1");
+
+  await scrollToProgress(0.4);
+  await expect(page.getByRole("heading", { name: "MATERIALI D’ELITE" })).toBeVisible();
+  await expect(page.locator(".ds-showreel-left:visible .ds-showreel-card")).toHaveCount(1);
+  await expectVideoToFillViewport();
+
+  await page.setViewportSize({ width: 680, height: 760 });
+  await scrollToProgress(0.62);
+  await expect(overlays).toHaveCount(0);
+  await scrollToProgress(0.72);
+  await expect(page.getByRole("heading", { name: "SCULTURA DI PRECISIONE" })).toBeVisible();
+  await expectVideoToFillViewport();
+  const narrowCard = await page.locator(".ds-showreel-overlay:visible .ds-showreel-card").boundingBox();
+  expect(narrowCard!.x + narrowCard!.width / 2).toBeCloseTo(340, 0);
+  expect(narrowCard!.y).toBeGreaterThan(380);
+
+  await scrollToProgress(0.91);
+  await expect(overlays).toHaveCount(0);
+  await scrollToProgress(0.95);
+  await expect(finalButton).toBeVisible();
+  await expect(finalButton).toBeDisabled();
+  await scrollToProgress(0.12);
+  await expect(firstCard).toHaveCSS("opacity", "1");
+  await scrollToProgress(1);
+  await expect(finalButton).toBeEnabled();
+  await expectVideoToFillViewport();
   await expect(page.locator("footer,.gallery-options")).toHaveCount(0);
+  await finalButton.focus();
+  await expect(finalButton).toBeFocused();
+  await finalButton.press("Enter");
+  await expect(page).toHaveURL(/#checkout$/);
 });
 test("complete image failure keeps recoverable provisional state", async ({
   page,
@@ -709,6 +758,11 @@ test("WebGL denial freezes mission time and offers the existing recovery path", 
     } as typeof get;
   });
   await enterTutorial(page);
+  await expect(backdrop(page)).toHaveCSS(
+    "background-image",
+    /BatCaverna_BatcomputerPerspective\.jpg/,
+  );
+  await expect(backdrop(page).locator("canvas")).toBeHidden();
   await beginMission(page);
   await expect(
     page.getByRole("heading", { name: "La Batcaverna non è disponibile." }),
@@ -738,6 +792,37 @@ test("failed videos fall back to images and transitions can continue", async ({
     page.getByRole("heading", { name: "MISSIONE COMPIUTA" }),
   ).toBeVisible();
 });
+test("a video that stalls after decoding still opens the mission on the static panorama", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.addInitScript(() => {
+    const media = HTMLMediaElement.prototype;
+    const play = media.play;
+    const readyState = Object.getOwnPropertyDescriptor(media, "readyState")!;
+    const stalls = (element: HTMLMediaElement) =>
+      !element.isConnected &&
+      element.src.endsWith("BatCaverna_Batcomputer360.mp4");
+    Object.defineProperty(media, "readyState", {
+      ...readyState,
+      get(this: HTMLMediaElement) {
+        return stalls(this)
+          ? HTMLMediaElement.HAVE_CURRENT_DATA
+          : readyState.get!.call(this);
+      },
+    });
+    media.play = function (this: HTMLMediaElement) {
+      return stalls(this) ? new Promise<void>(() => {}) : play.call(this);
+    };
+  });
+  await enterTutorial(page);
+  await beginMission(page);
+  await expect(page.locator(".panorama-scene .ds-loading-screen")).toBeVisible();
+  await page.clock.fastForward(8200);
+  await expect(
+    page.getByRole("button", { name: "Raggiungi indizio 1", exact: true }),
+  ).toBeEnabled();
+});
 test("hint, pause and failure use active mission time without added badges", async ({
   page,
 }) => {
@@ -747,6 +832,21 @@ test("hint, pause and failure use active mission time without added badges", asy
   await expect(page.locator(".ds-clue-hint")).toHaveCount(1);
   await page.getByRole("button", { name: "Metti in pausa esperienza" }).click();
   await expect(backdrop(page)).toHaveCSS("z-index", "100");
+  const pauseTitle = page.getByRole("heading", { name: "MISSIONE IN PAUSA" });
+  expect(
+    await pauseTitle.evaluate((title) => {
+      const background =
+        document.querySelector<HTMLElement>(".batcave-backdrop")!;
+      // Include the decorative layer in the hit test to check the paint order.
+      background.inert = false;
+      background.style.pointerEvents = "auto";
+      const { x, y, width, height } = title.getBoundingClientRect();
+      const top = document.elementFromPoint(x + width / 2, y + height / 2);
+      background.style.removeProperty("pointer-events");
+      background.inert = true;
+      return Boolean(top?.closest(".ds-pause"));
+    }),
+  ).toBe(true);
   const time = await page.locator("nav [role=timer]").innerText();
   await page.clock.fastForward(70000);
   await expect(page.locator("nav [role=timer]")).toHaveText(time);
@@ -757,7 +857,7 @@ test("hint, pause and failure use active mission time without added badges", asy
   ).toBeVisible();
   await expect(backdrop(page)).toHaveCSS(
     "background-image",
-    /BatCaverna_Batcomputer360\.jpg/,
+    /BatCaverna_BatcomputerPerspective\.jpg/,
   );
   await expect(
     page.locator("nav [role=timer],nav [role=progressbar]"),
@@ -821,6 +921,10 @@ test("axe checks official start, tutorial, checkout, confirmation and static sho
   await check();
   await page.goto("/#statua");
   await expect(page.locator(".ds-statue-poster")).toBeVisible();
+  await expect(page.locator(".statue-stage canvas")).toHaveCount(0);
+  await expect(
+    page.locator("main").getByRole("button", { name: "PREORDINA IL CAVALIERE" }),
+  ).toBeEnabled();
   await check();
 });
 test("unknown paths and the static error entry show the Figma 404", async ({
