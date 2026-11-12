@@ -680,9 +680,16 @@ test("showreel paints without scrolling, bounds requests and recovers after miss
   const finalButton = page.locator("main").getByRole("button", {
     name: "PREORDINA IL CAVALIERE",
   });
+  const contentViewport = () =>
+    page.evaluate(() => ({
+      width: document.documentElement.clientWidth,
+      height: document.documentElement.clientHeight,
+    }));
   const expectVideoToFillViewport = async () => {
-    const { width, height } = page.viewportSize()!;
-    await expect.poll(() => canvas.boundingBox()).toEqual({ x: 0, y: 0, width, height });
+    const { width, height } = await contentViewport();
+    await expect
+      .poll(() => canvas.boundingBox())
+      .toEqual({ x: 0, y: 0, width, height });
   };
 
   await expect(overlays).toHaveCount(0);
@@ -713,9 +720,15 @@ test("showreel paints without scrolling, bounds requests and recovers after miss
   await scrollToProgress(0.72);
   await expect(page.getByRole("heading", { name: "SCULTURA DI PRECISIONE" })).toBeVisible();
   await expectVideoToFillViewport();
-  const narrowCard = await page.locator(".ds-showreel-overlay:visible .ds-showreel-card").boundingBox();
-  expect(narrowCard!.x + narrowCard!.width / 2).toBeCloseTo(340, 0);
-  expect(narrowCard!.y).toBeGreaterThan(380);
+  const narrowCard = await page
+    .locator(".ds-showreel-overlay:visible .ds-showreel-card")
+    .boundingBox();
+  const narrowViewport = await contentViewport();
+  expect(narrowCard!.x + narrowCard!.width / 2).toBeCloseTo(
+    narrowViewport.width / 2,
+    0,
+  );
+  expect(narrowCard!.y).toBeGreaterThan(narrowViewport.height / 2);
 
   await scrollToProgress(0.91);
   await expect(overlays).toHaveCount(0);
