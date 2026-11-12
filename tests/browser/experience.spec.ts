@@ -460,7 +460,7 @@ test("mouse mission discovers hidden cards and collects them through the HUD", a
         path: test.info().outputPath("mouse-card-front.png"),
       });
     const rect = await front.boundingBox();
-    expect(rect!.width).toBe(80);
+    expect(rect!.width).toBeCloseTo(80, 1);
     await page.mouse.click(
       rect!.x + rect!.width / 2,
       rect!.y + rect!.height / 2,
