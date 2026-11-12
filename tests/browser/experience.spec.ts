@@ -339,7 +339,7 @@ test("keyboard mission flips in-world cards, supports wrong answers and escape, 
   await expect(page.locator("main [role=timer]")).not.toHaveText("00.00");
   await expect(backdrop(page)).toHaveCSS(
     "background-image",
-    /BatCaverna_Batcomputer360\.jpg/,
+    /BatCaverna_BatcomputerPerspective\.jpg/,
   );
   await expect(backdrop(page).locator("video")).toHaveCount(0);
   await expect(
