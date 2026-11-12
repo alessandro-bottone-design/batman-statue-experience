@@ -398,6 +398,14 @@ test("mouse mission discovers hidden cards and collects them through the HUD", a
 }) => {
   test.setTimeout(180000);
   await start(page, false);
+  const progress = page.getByRole("progressbar", { name: "Indizi raccolti" });
+  const counts = await progress.evaluateHandle((node) => {
+    const values: (string | null)[] = [];
+    // The fifth value is visible only until the victory screen replaces the HUD.
+    new MutationObserver(() => values.push(node.getAttribute("aria-valuenow")))
+      .observe(node, { attributeFilter: ["aria-valuenow"] });
+    return values;
+  });
   for (let id = 1; id <= 5; id++) {
     const front = page.getByRole("button", {
       name: `Apri indizio ${id}`,
@@ -497,8 +505,6 @@ test("mouse mission discovers hidden cards and collects them through the HUD", a
     await page
       .getByRole("button", { name: responses[id - 1], exact: true })
       .click();
-    const progress = page.getByRole("progressbar", { name: "Indizi raccolti" });
-    await expect(progress).toHaveAttribute("aria-valuenow", String(id));
     await expect(dialog).toBeHidden();
     if (id === 2 || id === 3) {
       await expect(
@@ -510,6 +516,8 @@ test("mouse mission discovers hidden cards and collects them through the HUD", a
   await expect(
     page.getByRole("heading", { name: "MISSIONE COMPIUTA" }),
   ).toBeVisible();
+  expect(await counts.jsonValue()).toEqual(["1", "2", "3", "4", "5"]);
+  await counts.dispose();
 });
 test("checkout validates each Figma step, keeps entered values and displays the demo total", async ({
   page,
