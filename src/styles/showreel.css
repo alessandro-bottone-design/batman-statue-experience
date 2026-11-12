@@ -1,0 +1,136 @@
+.experience-shell[data-phase="showreel"] {
+  background: var(--black);
+}
+[data-phase="showreel"] > .ds-navbar {
+  position: fixed;
+  min-height: 104px;
+}
+[data-phase="showreel"] .ds-navbar .ds-logos {
+  zoom: 0.65;
+}
+.statue-scroll {
+  position: relative;
+  height: 520dvh;
+}
+.statue-stage {
+  --reel-gutter: clamp(16px, 4vw, 72px);
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--black);
+}
+.ds-showreel-media {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.statue-stage canvas,
+.ds-statue-poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ds-statue-poster {
+  object-fit: cover;
+  object-position: center;
+}
+.ds-showreel-hint {
+  position: absolute;
+  inset: auto var(--reel-gutter) 20px;
+  color: var(--white);
+  text-align: center;
+  font: 14px/1.5 "Space Grotesk", sans-serif;
+  text-shadow: 0 1px 5px var(--black);
+  pointer-events: none;
+}
+.ds-showreel-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--nav-height) var(--reel-gutter) 24px;
+  pointer-events: none;
+}
+.ds-showreel-overlay button:not(:disabled) {
+  pointer-events: auto;
+}
+.ds-showreel-right {
+  align-items: flex-end;
+}
+.ds-showreel-left {
+  align-items: flex-start;
+}
+.ds-showreel-card {
+  display: grid;
+  gap: 12px;
+  width: min(30%, 400px);
+  padding: clamp(14px, 1.9vw, 28px);
+  text-align: start;
+  border-radius: 16px;
+  box-shadow: none;
+  outline: 1px solid color-mix(in srgb, var(--yellow) 65%, transparent);
+}
+.ds-showreel-card .ds-heading-l {
+  font-size: clamp(18px, 2vw, 32px);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.ds-showreel-card .ds-body {
+  font-size: clamp(14px, 1.3vw, 18px);
+  line-height: 1.5;
+  font-weight: 400;
+}
+.ds-showreel-final {
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  text-align: center;
+  padding-bottom: clamp(20px, 5svh, 48px);
+}
+.ds-showreel-final .ds-display {
+  font-size: clamp(30px, 4vw, 62px);
+  line-height: 1.05;
+}
+.ds-showreel-final .ds-button {
+  min-width: 246px;
+}
+@media (max-width: 900px) {
+  [data-phase="showreel"] > .ds-navbar {
+    align-items: center;
+    min-height: 0;
+  }
+  [data-phase="showreel"] .ds-navbar .ds-logos {
+    zoom: 0.45;
+  }
+  [data-phase="showreel"] .ds-navbar-actions {
+    gap: 14px;
+    max-width: none;
+    flex-wrap: nowrap;
+  }
+}
+@media (max-width: 760px) {
+  .ds-showreel-step {
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: clamp(20px, 5svh, 48px);
+  }
+  .ds-showreel-card {
+    width: min(100%, 380px);
+  }
+}
+@media (max-width: 520px) {
+  [data-phase="showreel"] .ds-navbar .ds-logos {
+    zoom: 0.24;
+  }
+  [data-phase="showreel"] .ds-navbar-actions {
+    gap: 10px;
+  }
+}
+@media (max-width: 370px) {
+  [data-phase="showreel"] .ds-navbar-actions {
+    flex-wrap: wrap;
+    max-width: 170px;
+  }
+}

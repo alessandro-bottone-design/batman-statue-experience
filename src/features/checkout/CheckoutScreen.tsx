@@ -170,6 +170,9 @@ export default function CheckoutScreen({
       <h1 id="checkout-title" className="ds-display">
         CHECKOUT
       </h1>
+      <p id="checkout-demo" className="ds-checkout-notice">
+        Preordine dimostrativo. Usa solo dati fittizi.
+      </p>
       <form
         ref={form}
         noValidate
@@ -177,6 +180,7 @@ export default function CheckoutScreen({
         onSubmit={advance}
         className={"ds-panel ds-checkout-card ds-checkout-" + current.name}
         aria-labelledby="checkout-step-title"
+        aria-describedby="checkout-demo"
         data-figma-node={current.id}
       >
         <h2

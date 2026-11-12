@@ -27,7 +27,7 @@ export default function ThankYouScreen({
             <br />A BUON FINE
           </h1>
           <p className="ds-body">
-            Il tuo ordine è stato registrato con successo.
+            Simulazione completata. Nessun ordine o pagamento reale.
           </p>
         </header>
         <dl>

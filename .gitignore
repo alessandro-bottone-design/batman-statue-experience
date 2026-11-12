@@ -6,17 +6,14 @@ coverage/
 .env*
 !.env.example
 
-# PNG Sequences
+# Local PNG source sequences
 [0-9][0-9][0-9][0-9].png
 
-# Large Root Assets
-.vercel
+# Local Vercel link
+/.vercel/
 
-# Vercel
-.vercel/
-
-# Generated build and browser evidence
-dist/
-artifacts/
-playwright-report/
-test-results/
+# Build, local reports and legacy report locations
+/dist/
+/artifacts/
+/playwright-report/
+/test-results/

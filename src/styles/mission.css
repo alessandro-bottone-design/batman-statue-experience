@@ -1,0 +1,227 @@
+.panorama-scene {
+  position: fixed;
+  inset: 0;
+  background: var(--black);
+  overflow: auto;
+}
+.panorama-scene > div:first-child {
+  position: absolute;
+  inset: 0;
+  min-height: 466px;
+}
+.panorama-scene canvas {
+  display: block;
+}
+.ds-world-clue {
+  width: 300px;
+  height: 426px;
+  perspective: 1000px;
+  --tone: var(--purple);
+  --glare: var(--glare-purple);
+  --glare-box: var(--glare-box-purple);
+}
+.ds-clue-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+.ds-clue-front,
+.ds-clue-back {
+  position: absolute;
+  inset: 0;
+  width: 300px;
+  min-height: 426px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: transparent;
+  border: 0;
+  padding: 20px;
+  transition:
+    transform 0.3s,
+    visibility 0s 0.15s;
+}
+.ds-clue-front {
+  transform: rotateY(0deg);
+  visibility: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ds-clue-front > span {
+  display: block;
+  width: 260px;
+  height: 386px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+}
+.ds-clue-front img {
+  position: absolute;
+  left: 0;
+  top: -0.02%;
+  width: 100%;
+  height: 100.04%;
+  max-width: none;
+}
+.ds-clue-front:hover > span,
+.ds-clue-front:focus-visible > span,
+.ds-clue-hint .ds-clue-front > span {
+  filter: var(--glare-purple);
+}
+.ds-clue-front:focus-visible > span {
+  outline: 2px solid var(--purple);
+  outline-offset: 4px;
+}
+.ds-clue-front:disabled {
+  cursor: default;
+}
+.ds-clue-back {
+  transform: rotateY(-180deg);
+  visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 47px 26px;
+}
+/* Explicit face visibility also works on WebKit software compositors. */
+.ds-world-clue[data-face="back"] .ds-clue-front {
+  transform: rotateY(180deg);
+  visibility: hidden;
+}
+.ds-world-clue[data-face="back"] .ds-clue-back {
+  transform: rotateY(0deg);
+  visibility: visible;
+}
+.ds-card-back-art,
+.ds-story-card-back-art {
+  position: absolute;
+  inset: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+.ds-card-back-art > span,
+.ds-story-card-back-art > span {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+.ds-card-art-top,
+.ds-card-art-bottom {
+  height: 80px;
+  flex: none;
+}
+.ds-card-art-top {
+  border-radius: 15px 15px 0 0;
+}
+.ds-card-art-bottom {
+  border-radius: 0 0 15px 15px;
+}
+.ds-card-art-middle {
+  flex: 1;
+}
+.ds-card-back-art img,
+.ds-story-card-back-art img {
+  position: absolute;
+  max-width: none;
+  width: 100%;
+  left: 0;
+}
+.ds-card-art-top img {
+  height: 482.5%;
+  top: 0;
+}
+.ds-card-art-middle img {
+  height: 170.8%;
+  top: -35.4%;
+}
+.ds-card-art-bottom img {
+  height: 482.5%;
+  top: -382.5%;
+}
+.ds-world-clue[data-feedback="success"] .ds-card-back-art {
+  filter: var(--glare-yellow);
+}
+.ds-world-clue[data-feedback="error"] .ds-card-back-art {
+  filter: var(--glare-purple);
+}
+.ds-card-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 243px;
+  flex: none;
+}
+.ds-question {
+  white-space: pre-line;
+  padding: 2px 5px;
+  width: 222px;
+  font:
+    700 12px/16px Poppins,
+    sans-serif;
+  color: var(--white);
+  text-align: center;
+}
+.ds-answer {
+  height: 28px;
+  min-height: 28px;
+  width: 237px;
+  flex: none;
+  padding: 0 16px;
+  border: 0;
+  outline: 2px solid var(--black);
+  border-radius: 999px;
+  color: var(--black);
+  background: var(--white);
+  font:
+    700 12px/16px "Space Grotesk",
+    sans-serif;
+}
+.ds-answer[data-state="active"]:hover:not(:disabled) {
+  background: var(--black);
+  color: var(--white);
+  outline-color: var(--white);
+}
+.ds-answer[data-state="error"] {
+  background: var(--purple);
+  outline-color: var(--black);
+  filter: var(--glare-purple);
+}
+.ds-answer[data-state="success"] {
+  background: var(--yellow);
+  outline-color: var(--black);
+  filter: var(--glare);
+}
+.ds-answer[data-state="disabled"] {
+  opacity: 0.4;
+}
+.ds-answer:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 3px;
+}
+.ds-answer-label {
+  min-height: 28px;
+  padding: 10px;
+  text-align: center;
+}
+.ds-answer-success {
+  --tone: var(--yellow);
+  filter: var(--glare);
+  text-shadow:
+    0 2px 8px #ffd70099,
+    0 8px 32px #ffd7004d,
+    0 16px 64px #ffd70026;
+}
+.ds-answer-error {
+  --tone: var(--purple);
+  filter: var(--glare-purple);
+  text-shadow:
+    0 2px 8px #a64dff99,
+    0 8px 32px #a64dff4d,
+    0 16px 64px #a64dff26;
+}

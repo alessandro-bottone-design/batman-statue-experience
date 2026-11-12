@@ -1,0 +1,71 @@
+.ds-result {
+  width: 478px;
+  max-width: 100%;
+  min-height: 739px;
+  padding: 20px;
+  justify-content: flex-start;
+  gap: 40px;
+}
+.ds-result .ds-display {
+  margin-block: 20px;
+}
+.ds-result .ds-body {
+  width: 419px;
+  max-width: 100%;
+  padding: 20px;
+}
+.ds-result-loss {
+  width: 434px;
+  min-height: 444px;
+}
+.ds-not-found {
+  width: 424px;
+  max-width: 100%;
+  min-height: 279px;
+  padding: 20px;
+}
+.ds-not-found h1,
+.ds-not-found p {
+  padding: 20px;
+}
+
+.result-screen {
+  min-height: calc(100svh - var(--nav-height));
+  padding: 100px 8vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  font-family: "Space Grotesk", sans-serif;
+  background: #08080b;
+  color: #f4f2ed;
+}
+.result-screen h1 {
+  font-size: 48px;
+  line-height: 1.1;
+}
+.result-screen .eyebrow {
+  color: #ffd700;
+  font-size: 12px;
+}
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.result-screen button,
+.statue-loading button {
+  min-height: 48px;
+  padding: 15px 24px;
+  border: 1px solid #ffd700;
+  background: #ffd700;
+  color: #08080b;
+  font:
+    700 13px/1.3 "Space Grotesk",
+    sans-serif;
+  border-radius: 2px;
+}
+.result-screen .secondary {
+  background: #101014;
+  color: #ffd700;
+}

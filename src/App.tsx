@@ -317,8 +317,8 @@ function Experience() {
             />
           )}
         </div>
-        {paused && <PauseOverlay />}
       </main>
+      {paused && <PauseOverlay />}
       <Cursor />
     </div>
   );
