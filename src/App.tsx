@@ -66,6 +66,8 @@ function Experience() {
   const [paused, setPaused] = useState(false),
     [muted, setMuted] = useState(false),
     [ready, setReady] = useState(false);
+  const [collecting, setCollecting] = useState(false);
+  const progressTrack = useRef<HTMLSpanElement>(null);
   const reduced = !!useReducedMotion(),
     heading = useRef<HTMLDivElement>(null);
   const transition = phase === "transition1" || phase === "transition2";
@@ -80,7 +82,7 @@ function Experience() {
     ["batcomputer", "armeria", "batmobile"].includes(phase);
   const time = useMissionTimer(
     status,
-    paused || !ready,
+    paused || !ready || collecting,
     transition,
     useCallback(() => dispatch({ type: "fail" }), []),
   );
@@ -95,10 +97,6 @@ function Experience() {
     window.scrollTo(0, 0);
     heading.current?.focus();
   }, [viewPhase]);
-  useEffect(() => {
-    if (state.completed === 5 && status === "active")
-      dispatch({ type: "win", time: time.timeLeft });
-  }, [state.completed, status, time.timeLeft]);
   useEffect(() => {
     if (
       state.completed === 2 &&
@@ -144,7 +142,13 @@ function Experience() {
   }, [state.order]);
   const canPause =
     phase !== "checkout" && phase !== "thankyou" && phase !== "showreel";
-  const togglePause = () => setPaused((previous) => !previous);
+  const togglePause = () => {
+    if (paused) {
+      BatcavernAudio.setPaused(false);
+      BatcavernAudio.uiClick();
+    }
+    setPaused(!paused);
+  };
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if (
@@ -213,7 +217,10 @@ function Experience() {
         onToggleMute={() => {
           const next = !muted;
           BatcavernAudio.setMuted(next);
-          if (!next) BatcavernAudio.start();
+          if (!next) {
+            BatcavernAudio.start();
+            BatcavernAudio.uiClick();
+          }
           setMuted(next);
         }}
         isPaused={paused}
@@ -221,6 +228,7 @@ function Experience() {
         onPreorder={phase === "showreel" && !paused ? goCheckout : undefined}
         completedCount={phase === "tutorial" ? 0 : state.completed}
         timeLeft={phase === "tutorial" ? 180 : time.timeLeft}
+        progressTrack={progressTrack}
       />
       <main id="experience-content" ref={heading} tabIndex={-1}>
         <div
@@ -262,10 +270,15 @@ function Experience() {
                   }
                   isPaused={paused}
                   isMuted={muted}
-                  isMissionActive
-                  onNext={() => dispatch({ type: "next" })}
+                  onNext={() => {
+                    if (scene === "batmobile")
+                      dispatch({ type: "win", time: time.timeLeft });
+                    else dispatch({ type: "next" });
+                  }}
                   onReady={setReady}
                   onExit={goStatue}
+                  onCollecting={setCollecting}
+                  progressTrack={progressTrack}
                 />
               </ErrorBoundary>
             )}

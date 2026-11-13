@@ -58,9 +58,6 @@ export default function SkipTransitionScreen({
         />
       )}
       <div className="ds-skip-transition" data-figma-node="359:3936">
-        <div className="ds-skip-transition-title" data-figma-node="359:3927">
-          <p className="ds-heading ds-purple">TRANSIZIONE ALLA PROSSIMA AREA</p>
-        </div>
         <div className="ds-skip-transition-action" data-figma-node="359:3926">
           <Button tone="secondary" disabled={isPaused} onClick={finish}>
             {label}

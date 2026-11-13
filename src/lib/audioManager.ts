@@ -82,7 +82,13 @@ export const BatcavernAudio = {
   getInstance() {
     return music;
   },
-  beep(frequency: number, type: OscillatorType = "sine", duration = 0.25) {
+  beep(
+    frequency: number,
+    type: OscillatorType = "sine",
+    duration = 0.25,
+    volume = 0.08,
+    delay = 0,
+  ) {
     if (muted || paused) return;
     try {
       const { ctx, gain } = graph();
@@ -90,11 +96,10 @@ export const BatcavernAudio = {
       const envelope = ctx.createGain();
       oscillator.type = type;
       oscillator.frequency.value = frequency;
-      envelope.gain.setValueAtTime(0.08, ctx.currentTime);
-      envelope.gain.exponentialRampToValueAtTime(
-        0.001,
-        ctx.currentTime + duration,
-      );
+      const start = ctx.currentTime + delay;
+      envelope.gain.setValueAtTime(0.001, start);
+      envelope.gain.exponentialRampToValueAtTime(volume, start + 0.006);
+      envelope.gain.exponentialRampToValueAtTime(0.001, start + duration);
       oscillator.connect(envelope);
       envelope.connect(gain);
       sources.add(oscillator);
@@ -103,11 +108,18 @@ export const BatcavernAudio = {
         oscillator.disconnect();
         envelope.disconnect();
       };
-      oscillator.start();
-      oscillator.stop(ctx.currentTime + duration);
+      oscillator.start(start);
+      oscillator.stop(start + duration);
     } catch {
       /* Audio is optional. */
     }
+  },
+  uiClick() {
+    this.beep(410, "triangle", 0.075, 0.035);
+  },
+  clueCollected() {
+    this.beep(523.25, "triangle", 0.13, 0.055);
+    this.beep(783.99, "sine", 0.19, 0.055, 0.06);
   },
   clip(src: string) {
     if (muted || paused) return () => {};

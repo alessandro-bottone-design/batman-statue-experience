@@ -298,14 +298,14 @@ test("tutorial uses the four official steps and the mission HUD", async ({
     page.getByRole("heading", { name: "TROVA TUTTI GLI INDIZI" }),
   ).toBeVisible();
 });
-test("keyboard mission flips in-world cards, supports wrong answers and escape, then wins", async ({
+test("keyboard mission inspects cards, supports wrong answers and escape, then wins", async ({
   page,
 }) => {
   test.setTimeout(240000);
   await start(page);
   await expect(backdrop(page)).toHaveCount(0);
   await reach(page, 1);
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "Enigma 1" })).toBeVisible();
   await page.getByRole("button", { name: "JOKER", exact: true }).click();
   await expect(
     page.getByText("RISPOSTA ERRATA", { exact: true }),
@@ -393,23 +393,36 @@ test("correct feedback survives pause and early clues retain the hidden time bon
   expect(minutes * 60 + seconds).toBeGreaterThan(180);
   await expect(page.getByText(/Bonus esplorazione|SPEEDRUN/)).toHaveCount(0);
 });
-test("mouse mission finds and flips every card without a centered dialog", async ({
+test("mouse mission discovers hidden cards and collects them through the HUD", async ({
   page,
 }) => {
   test.setTimeout(180000);
   await start(page, false);
+  const progress = page.getByRole("progressbar", { name: "Indizi raccolti" });
+  const counts = await progress.evaluateHandle((node) => {
+    const values: (string | null)[] = [];
+    // The fifth value is visible only until the victory screen replaces the HUD.
+    new MutationObserver(() => values.push(node.getAttribute("aria-valuenow")))
+      .observe(node, { attributeFilter: ["aria-valuenow"] });
+    return values;
+  });
   for (let id = 1; id <= 5; id++) {
-    const front = page.locator('[data-clue-id="' + id + '"] .clue-card');
+    const front = page.getByRole("button", {
+      name: `Apri indizio ${id}`,
+      exact: true,
+    });
+    const marker = page.locator(`.ds-clue-marker[data-clue-id="${id}"]`);
     await expect(
       page.getByRole("button", {
         name: "Raggiungi indizio " + id,
         exact: true,
       }),
     ).toBeEnabled({ timeout: 45000 });
+    if (id === 1 || id === 3 || id === 4) await expect(marker).toBeHidden();
     const viewport = page.viewportSize()!;
     let point: { x: number; y: number } | null = null;
     for (let scan = 0; scan < 180 && !point; scan++) {
-      point = await front.evaluate((el) => {
+      point = await marker.evaluate((el) => {
         const r = el.getBoundingClientRect(),
           x = r.x + r.width / 2,
           y = r.y + r.height / 2;
@@ -454,10 +467,8 @@ test("mouse mission finds and flips every card without a centered dialog", async
       await page.screenshot({
         path: test.info().outputPath("mouse-card-front.png"),
       });
-    const before = await page
-      .locator('[data-clue-id="' + id + '"]')
-      .boundingBox();
     const rect = await front.boundingBox();
+    expect(rect!.width).toBeCloseTo(80, 1);
     await page.mouse.click(
       rect!.x + rect!.width / 2,
       rect!.y + rect!.height / 2,
@@ -476,27 +487,43 @@ test("mouse mission finds and flips every card without a centered dialog", async
       await page.screenshot({
         path: test.info().outputPath("mouse-card-back.png"),
       });
-    const after = await page
-      .locator('[data-clue-id="' + id + '"]')
-      .boundingBox();
-    expect(Math.abs(after!.x - before!.x)).toBeLessThan(2);
-    expect(Math.abs(after!.y - before!.y)).toBeLessThan(2);
-    await expect(page.getByRole("dialog")).toHaveCount(0);
+    const dialog = page.getByRole("dialog", { name: `Enigma ${id}` });
+    const after = await dialog.boundingBox();
+    expect(after!.width).toBeGreaterThan(rect!.width * 3);
+    expect(
+      Math.abs(after!.x + after!.width / 2 - viewport.width / 2),
+    ).toBeLessThan(2);
+    expect(
+      Math.abs(after!.y + after!.height / 2 - viewport.height / 2),
+    ).toBeLessThan(2);
+    if (id === 1) {
+      await page.mouse.click(viewport.width / 2 + 210, viewport.height / 2);
+      await expect(dialog).toBeHidden();
+      await expect(front).toBeFocused();
+      await front.click();
+    }
     await page
       .getByRole("button", { name: responses[id - 1], exact: true })
       .click();
+    await expect(dialog).toBeHidden();
+    if (id === 2 || id === 3) {
+      await expect(
+        page.getByText("TRANSIZIONE ALLA PROSSIMA AREA", { exact: true }),
+      ).toHaveCount(0);
+      await page.getByRole("button", { name: "SALTA LA TRANSIZIONE" }).click();
+    }
   }
   await expect(
     page.getByRole("heading", { name: "MISSIONE COMPIUTA" }),
   ).toBeVisible();
+  expect(await counts.jsonValue()).toEqual(["1", "2", "3", "4", "5"]);
+  await counts.dispose();
 });
 test("checkout validates each Figma step, keeps entered values and displays the demo total", async ({
   page,
 }) => {
   await page.goto("/#checkout");
-  await expect(
-    page.getByText("Preordine dimostrativo. Usa solo dati fittizi."),
-  ).toBeVisible();
+  await expect(page.getByText(/Preordine dimostrativo/)).toBeVisible();
   await expect(backdrop(page).locator("video")).toHaveAttribute(
     "src",
     BATCOMPUTER_VIDEO,
@@ -505,6 +532,11 @@ test("checkout validates each Figma step, keeps entered values and displays the 
   const back = page.getByRole("button", { name: "Tappa precedente" });
   await expect(page.locator("input")).toHaveCount(5);
   await expect(page.locator("[name=email]")).toHaveValue("");
+  await page.locator("[name=email]").fill("indirizzo-incompleto");
+  await page.keyboard.press("ArrowRight");
+  await expect(
+    page.getByRole("heading", { name: "DATI PERSONALI" }),
+  ).toBeVisible();
   await next.click();
   await expect(page.locator("[aria-invalid=true]")).toHaveCount(5);
   await expect(page.locator("[name=phone]")).toBeFocused();
@@ -519,8 +551,6 @@ test("checkout validates each Figma step, keeps entered values and displays the 
   await next.click();
   await expect(page.locator("[name=address]")).toHaveValue(SHIPPING.address);
   await next.click();
-  await next.click();
-  await expect(page.getByRole("radio", { name: "PAYPAL" })).toBeFocused();
   await page.getByRole("radio", { name: "CARTA DI CREDITO O DEBITO" }).check();
   await expect(page.locator("input:not([type=radio])")).toHaveCount(4);
   await next.click();
@@ -533,6 +563,42 @@ test("checkout validates each Figma step, keeps entered values and displays the 
     page.locator("input[name=quantity],input[name=promo]"),
   ).toHaveCount(0);
 });
+for (const interaction of ["mouse", "keyboard"]) {
+  test(`blank checkout reaches the local confirmation by ${interaction}`, async ({
+    page,
+  }) => {
+    const requests = observeCheckoutRequests(page);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/#checkout");
+    const next = page.getByRole("button", { name: "Tappa successiva" });
+    const back = page.getByRole("button", { name: "Tappa precedente" });
+    const confirm = page.getByRole("button", { name: "CHECKOUT", exact: true });
+    const heading = (name: string) =>
+      page.getByRole("heading", { name, exact: true });
+    const advance = async (key = "ArrowRight") => {
+      if (interaction === "mouse") await next.click();
+      else await page.keyboard.press(key);
+    };
+    await expect(heading("DATI PERSONALI")).toBeFocused();
+    await advance("Space");
+    await expect(heading("DATI DI SPEDIZIONE")).toBeFocused();
+    if (interaction === "mouse") await back.click();
+    else await page.keyboard.press("ArrowLeft");
+    await expect(heading("DATI PERSONALI")).toBeFocused();
+    await advance();
+    await advance();
+    await expect(heading("METODO DI PAGAMENTO")).toBeFocused();
+    await advance("Space");
+    await expect(heading("ORDINE")).toBeFocused();
+    await expect(page.getByText("750€", { exact: true })).toBeVisible();
+    if (interaction === "mouse") await confirm.click();
+    else await page.keyboard.press("Space");
+    await expect(confirm).toBeDisabled();
+    await expect(heading("ACQUISTO ANDATO A BUON FINE")).toBeVisible();
+    await expect(page).toHaveURL(/#conferma$/);
+    await expectLocalCheckout(page, requests);
+  });
+}
 test("valid PayPal demo creates only a local guarded confirmation", async ({
   page,
 }) => {
@@ -830,11 +896,13 @@ test("a video that stalls after decoding still opens the mission on the static p
   });
   await enterTutorial(page);
   await beginMission(page);
-  await expect(page.locator(".panorama-scene .ds-loading-screen")).toBeVisible();
+  const firstClue = page.getByRole("button", {
+    name: "Raggiungi indizio 1",
+    exact: true,
+  });
+  await expect(firstClue).toBeEnabled({ timeout: 5000 });
   await page.clock.fastForward(8200);
-  await expect(
-    page.getByRole("button", { name: "Raggiungi indizio 1", exact: true }),
-  ).toBeEnabled();
+  await expect(firstClue).toBeEnabled();
 });
 test("hint, pause and failure use active mission time without added badges", async ({
   page,
@@ -957,7 +1025,7 @@ test("unknown paths and the static error entry show the Figma 404", async ({
     ).toBeVisible();
   }
 });
-test("mute affects existing sources and blocks answer beeps", async ({
+test("button activations play UI feedback and mute blocks click and answer sounds", async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -972,8 +1040,7 @@ test("mute affects existing sources and blocks answer beeps", async ({
     };
   });
   await start(page);
-  await page.getByRole("button", { name: "Silenzia audio" }).click();
-  const counts = await page.evaluate(() => {
+  await page.evaluate(() => {
     let count = 0;
     const original = AudioContext.prototype.createOscillator;
     AudioContext.prototype.createOscillator = function (...args) {
@@ -981,15 +1048,16 @@ test("mute affects existing sources and blocks answer beeps", async ({
       return original.apply(this, args);
     };
     Object.defineProperty(window, "__beeps", { get: () => count });
-    return count;
   });
+  const oscillatorCount = () =>
+    page.evaluate(() => (window as unknown as { __beeps: number }).__beeps);
   await reach(page, 1);
+  expect(await oscillatorCount()).toBe(1);
+  await page.getByRole("button", { name: "Silenzia audio" }).click();
   await page.getByRole("button", { name: "JOKER", exact: true }).click();
-  expect(
-    await page.evaluate(
-      () => (window as unknown as { __beeps: number }).__beeps,
-    ),
-  ).toBe(counts);
+  await page.keyboard.press("Escape");
+  await reach(page, 1);
+  expect(await oscillatorCount()).toBe(1);
 });
 test("audio starts after returning to desktop from touch mode", async ({
   page,

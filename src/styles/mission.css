@@ -12,6 +12,71 @@
 .panorama-scene canvas {
   display: block;
 }
+.ds-clue-markers {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
+}
+.ds-clue-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 116px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  visibility: hidden;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.ds-clue-marker > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  filter: brightness(0.74);
+  pointer-events: none;
+}
+.ds-clue-marker:hover > img,
+.ds-clue-marker:focus-visible > img,
+.ds-clue-marker.ds-clue-hint > img {
+  filter: var(--glare-purple);
+}
+.ds-clue-marker:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 4px;
+}
+.ds-clue-marker[data-inspecting] {
+  opacity: 0;
+}
+.ds-inspection {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 45%);
+}
+.ds-inspection[data-stage="closing"],
+.ds-inspection[data-stage="flying"],
+.ds-inspection[data-stage="collected"] {
+  background: transparent;
+}
+.ds-inspection[data-stage="collected"] .ds-inspection-card {
+  visibility: hidden;
+}
+@media (max-height: 500px) {
+  .ds-inspection-card {
+    zoom: 0.82;
+  }
+}
+@media (max-height: 380px) {
+  .ds-inspection-card {
+    zoom: 0.7;
+  }
+}
 .ds-world-clue {
   width: 300px;
   height: 426px;

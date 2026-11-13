@@ -68,6 +68,8 @@ export default function CheckoutScreen({
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const form = useRef<HTMLFormElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
+  const nextButton = useRef<HTMLButtonElement>(null);
+  const backButton = useRef<HTMLButtonElement>(null);
   const focusError = useRef(false);
   const current = STEPS[step];
   const isOrder = current.name === "order";
@@ -90,6 +92,46 @@ export default function CheckoutScreen({
     }
   }, [step]);
 
+  useEffect(() => {
+    function handleShortcut(event: KeyboardEvent) {
+      if (
+        event.defaultPrevented ||
+        event.repeat ||
+        event.isComposing ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey
+      )
+        return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (
+        target?.closest(
+          'input, textarea, select, [contenteditable], a, [role="button"]',
+        )
+      )
+        return;
+      const focusedButton = target?.closest("button");
+      if (
+        focusedButton &&
+        (!form.current?.contains(focusedButton) || event.key === " ")
+      )
+        return;
+      const button =
+        event.key === "ArrowLeft"
+          ? backButton.current
+          : event.key === "ArrowRight" || event.key === " "
+            ? nextButton.current
+            : null;
+      if (!button || button.disabled) return;
+      event.preventDefault();
+      button.click();
+    }
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, []);
+
   function change(key: keyof CheckoutData, value: string) {
     const next = { ...data, [key]: value };
     setData(next);
@@ -107,9 +149,15 @@ export default function CheckoutScreen({
     if (timer.current !== null) return;
 
     const validation = validateCheckout(data, method);
+    const hasErrors = (stage: (typeof STEPS)[number]) => {
+      const started = stage.fields.some((key) =>
+        key === "paymentMethod" ? Boolean(method) : Boolean(data[key].trim()),
+      );
+      return started && stage.fields.some((key) => validation[key]);
+    };
     const invalidStep = isOrder
-      ? STEPS.findIndex((stage) => stage.fields.some((key) => validation[key]))
-      : current.fields.some((key) => validation[key])
+      ? STEPS.findIndex(hasErrors)
+      : hasErrors(current)
         ? step
         : -1;
     if (invalidStep !== -1) {
@@ -171,7 +219,8 @@ export default function CheckoutScreen({
         CHECKOUT
       </h1>
       <p id="checkout-demo" className="ds-checkout-notice">
-        Preordine dimostrativo. Usa solo dati fittizi.
+        Preordine dimostrativo. Puoi lasciare i campi vuoti e avanzare con le
+        frecce o Spazio. Usa solo dati fittizi.
       </p>
       <form
         ref={form}
@@ -257,6 +306,7 @@ export default function CheckoutScreen({
         <div className="ds-checkout-actions">
           {step > 0 && (
             <IconButton
+              ref={backButton}
               icon="chevron-left"
               aria-label="Tappa precedente"
               disabled={loading}
@@ -267,11 +317,12 @@ export default function CheckoutScreen({
             />
           )}
           {isOrder ? (
-            <Button disabled={loading} type="submit">
+            <Button ref={nextButton} disabled={loading} type="submit">
               CHECKOUT
             </Button>
           ) : (
             <IconButton
+              ref={nextButton}
               icon="chevron-right"
               aria-label="Tappa successiva"
               type="submit"

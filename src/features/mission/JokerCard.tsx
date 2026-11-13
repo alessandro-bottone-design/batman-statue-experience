@@ -8,10 +8,11 @@ interface Props {
   active: boolean;
   disabled: boolean;
   hint: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-  onSuccess: (id: number) => void;
-  onKeyboardFocus: () => void;
+  onOpen?: () => void;
+  onClose?: () => void;
+  onSuccess?: (id: number) => void;
+  onKeyboardFocus?: () => void;
+  onCorrect?: () => void;
 }
 export default function JokerCard({
   id,
@@ -25,6 +26,7 @@ export default function JokerCard({
   onClose,
   onSuccess,
   onKeyboardFocus,
+  onCorrect,
 }: Props) {
   const [chosen, setChosen] = useState<string | null>(null);
   const front = useRef<HTMLButtonElement>(null),
@@ -39,7 +41,7 @@ export default function JokerCard({
     else setChosen(null);
   }, [active]);
   useEffect(() => {
-    if (disabled || (!active && !restoreFront.current)) return;
+    if (disabled || (!active && (!onOpen || !restoreFront.current))) return;
     let frame = 0;
     const focusVisibleFace = () => {
       const face = active ? answers.current : front.current;
@@ -54,18 +56,18 @@ export default function JokerCard({
     };
     frame = requestAnimationFrame(focusVisibleFace);
     return () => cancelAnimationFrame(frame);
-  }, [active, disabled]);
+  }, [active, disabled, onOpen]);
   useEffect(() => {
     if (!correct) {
       remainingSuccess.current = 850;
       return;
     }
-    if (disabled) return;
+    if (disabled || onCorrect) return;
     const started = performance.now();
     let fired = false;
     const timer = setTimeout(() => {
       fired = true;
-      callback.current(id);
+      callback.current?.(id);
     }, remainingSuccess.current);
     return () => {
       clearTimeout(timer);
@@ -75,9 +77,9 @@ export default function JokerCard({
           remainingSuccess.current - performance.now() + started,
         );
     };
-  }, [correct, disabled, id]);
+  }, [correct, disabled, id, onCorrect]);
   useEffect(() => {
-    if (!active) return;
+    if (!active || !onClose) return;
     const escape = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || event.repeat || disabled) return;
       event.preventDefault();
@@ -88,7 +90,7 @@ export default function JokerCard({
     return () => window.removeEventListener("keydown", escape, true);
   }, [active, disabled, correct, onClose]);
   useEffect(() => {
-    if (!active) return;
+    if (!active || !onClose) return;
     const outside = (event: PointerEvent) => {
       if (
         !(event.target as Element)?.closest(".ds-world-clue,nav") &&
@@ -115,12 +117,12 @@ export default function JokerCard({
           className="clue-card ds-clue-front"
           aria-label={"Apri indizio " + id}
           aria-expanded={active}
-          aria-hidden={active}
-          inert={active}
-          disabled={disabled || active}
+          aria-hidden={active || !onOpen}
+          inert={active || !onOpen}
+          disabled={disabled || active || !onOpen}
           onClick={onOpen}
           onFocus={(e) => {
-            if (e.currentTarget.matches(":focus-visible")) onKeyboardFocus();
+            if (e.currentTarget.matches(":focus-visible")) onKeyboardFocus?.();
           }}
           onPointerDown={(e) => {
             if (e.button === 0) e.currentTarget.setPointerCapture(e.pointerId);
@@ -170,6 +172,7 @@ export default function JokerCard({
               <button
                 key={option}
                 className="ds-answer"
+                data-ui-sound="custom"
                 disabled={disabled || (correct && chosen !== option)}
                 data-state={
                   chosen === option
@@ -187,6 +190,7 @@ export default function JokerCard({
                     option === correctAnswer ? 880 : 150,
                     option === correctAnswer ? "sine" : "sawtooth",
                   );
+                  if (option === correctAnswer) onCorrect?.();
                 }}
               >
                 {option}
